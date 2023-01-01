@@ -120,7 +120,6 @@
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
     <None Include="app.manifest" />
-    <None Include="Bone King_TemporaryKey.pfx" />
     <None Include="Content\Fonts\debugFont.spritefont" />
   </ItemGroup>
   <ItemGroup>
