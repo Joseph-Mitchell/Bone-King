@@ -577,6 +577,7 @@ namespace Bone_King
                             if (game.deathSongInstance == null)
                             {
                                 game.deathSongInstance = game.deathSong.CreateInstance();
+                                game.deathSongInstance.Volume = 0.5f;
                                 game.deathSongInstance.Play();
                             }
                         }
