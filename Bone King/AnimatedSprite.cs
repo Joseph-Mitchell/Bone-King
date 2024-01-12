@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Bone_King
 {
-    class AnimatedObject
+    class AnimatedSprite
     {
         Texture2D spriteSheet;
         Vector2 position;
@@ -12,7 +12,7 @@ namespace Bone_King
         int frameTimer, animationSpeed;
         float layer;
 
-        public AnimatedObject (Texture2D spriteSheet, int x, int y, int width, int height, int animationSpeed, float layer)
+        public AnimatedSprite (Texture2D spriteSheet, int x, int y, int width, int height, int animationSpeed, float layer)
         {
             this.spriteSheet = spriteSheet;
             position = new Vector2(x, y);

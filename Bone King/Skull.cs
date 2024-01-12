@@ -6,7 +6,7 @@ namespace Bone_King
 {
     class Skull
     {
-        enum AnimState
+        enum State
         {
             Ladder,
             MovingLeft,
@@ -19,11 +19,11 @@ namespace Bone_King
         Rectangle source;
         public Rectangle collision;
 
-        AnimState animstate;
+        State state;
 
         int frameTimer;
         bool vulnerable, ladderIntersect;
-        public bool isActive;
+        public bool active;
 
         const int ANIMATIONSPEED = 15;
         const float GRAVITY = 0.1f, MOVEMENTSPEED = 0.7f;
@@ -35,16 +35,16 @@ namespace Bone_King
             source = new Rectangle(0, 0, 30, 32);
             collision = new Rectangle(x, y, 30, 32);
 
-            animstate = AnimState.MovingRight;
+            state = State.MovingRight;
 
             frameTimer = ANIMATIONSPEED;
-            isActive = true;
+            active = true;
         }
 
-        public void Update(Background background, Random RNG, int maxX, Barry player)
+        public void Update(Level background, Random RNG, int maxX, Barry player)
         {
             //Gravity
-            if (velocity.Y < GRAVITY * 30 && animstate != AnimState.Ladder)
+            if (velocity.Y < GRAVITY * 30 && state != State.Ladder)
             {
                 velocity.Y += GRAVITY;
             }
@@ -68,9 +68,9 @@ namespace Bone_King
             {
                 if (i != 0 && i != 2 && i != 4 && i != 5 && i != 7 && i != 10)
                 {
-                    if (collision.Intersects(background.ladderHitBoxes[i]) && collision.X + (collision.Width / 2) > background.ladderHitBoxes[i].X + (background.ladderHitBoxes[i].Width / 3) && collision.X + (collision.Width / 2) < background.ladderHitBoxes[i].X + ((background.ladderHitBoxes[i].Width / 3) * 2) && animstate != AnimState.Ladder)
+                    if (collision.Intersects(background.ladderHitBoxes[i]) && collision.X + (collision.Width / 2) > background.ladderHitBoxes[i].X + (background.ladderHitBoxes[i].Width / 3) && collision.X + (collision.Width / 2) < background.ladderHitBoxes[i].X + ((background.ladderHitBoxes[i].Width / 3) * 2) && state != State.Ladder)
                     {
-                        animstate = AnimState.Ladder;
+                        state = State.Ladder;
                         position.X = background.ladderHitBoxes[i].X + (background.ladderHitBoxes[i].Width / 2) - (collision.Width / 2);
                     }
                 }
@@ -81,34 +81,34 @@ namespace Bone_King
             }
 
             //Moves depending on animstate
-            if (animstate == AnimState.Ladder && !ladderIntersect)
+            if (state == State.Ladder && !ladderIntersect)
             {
-                animstate = AnimState.None;
+                state = State.None;
             }
-            if ((position.Y >= 359 || (position.Y >= 239 && position.Y < 299) || (position.Y >= 119 && position.Y < 179)) && animstate != AnimState.Ladder)
+            if ((position.Y >= 359 || (position.Y >= 239 && position.Y < 299) || (position.Y >= 119 && position.Y < 179)) && state != State.Ladder)
             {
-                animstate = AnimState.MovingRight;
+                state = State.MovingRight;
             }
-            else if (((position.Y < 359 && position.Y >= 299) || (position.Y < 239 && position.Y >= 179) || (position.Y < 119)) && animstate != AnimState.Ladder)
+            else if (((position.Y < 359 && position.Y >= 299) || (position.Y < 239 && position.Y >= 179) || (position.Y < 119)) && state != State.Ladder)
             {
-                animstate = AnimState.MovingLeft;
+                state = State.MovingLeft;
             }
 
             //Movement
-            if (animstate == AnimState.MovingLeft)
+            if (state == State.MovingLeft)
             {
                 velocity.X = -MOVEMENTSPEED;
             }
-            else if (animstate == AnimState.MovingRight)
+            else if (state == State.MovingRight)
             {
                 velocity.X = MOVEMENTSPEED;
             }
-            else if (animstate == AnimState.Ladder)
+            else if (state == State.Ladder)
             {
                 velocity.X = 0;
                 velocity.Y = -MOVEMENTSPEED;
             }
-            else if (animstate == AnimState.None)
+            else if (state == State.None)
             {
                 velocity.X = 0;
                 velocity.Y = 0;
@@ -166,7 +166,7 @@ namespace Bone_King
                     frameTimer -= 1;
                 }
             }
-            if (animstate == AnimState.MovingRight)
+            if (state == State.MovingRight)
             {
                 sb.Draw(spriteSheet, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.8f);
             }

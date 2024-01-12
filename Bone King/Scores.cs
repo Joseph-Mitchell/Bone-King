@@ -9,7 +9,7 @@ namespace Bone_King
         Vector2 position;
 
         float frameTimer;
-        public bool isActive;
+        public bool active;
 
         const float ACTIVETIME = 60;
         public Scores(Texture2D texture, int x, int y)
@@ -17,7 +17,7 @@ namespace Bone_King
             this.texture = texture;
             position = new Vector2(x, y);
 
-            isActive = true;
+            active = true;
             frameTimer = ACTIVETIME;
         }
 
@@ -25,7 +25,7 @@ namespace Bone_King
         {
             if (frameTimer <= 0)
             {
-                isActive = false;
+                active = false;
             }
             else
             {

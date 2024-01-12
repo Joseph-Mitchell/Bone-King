@@ -5,7 +5,7 @@ namespace Bone_King
 {
     class Barry
     {
-        public enum AnimState
+        public enum State
         {
             StandingRight,
             StandingLeft,
@@ -18,7 +18,7 @@ namespace Bone_King
             Death
         }
 
-        public AnimState animState;
+        public State state;
 
         Texture2D running, jumping, axe, climbing, climbingOver, death;
         Vector2 position, velocity;
@@ -35,7 +35,7 @@ namespace Bone_King
         public Barry(Texture2D running, Texture2D axe, Texture2D jumping, Texture2D climbing, Texture2D climbingover, Texture2D death, int x, int y)
         {
 
-            animState = AnimState.StandingRight;
+            state = State.StandingRight;
 
             this.running = running;
             this.axe = axe;
@@ -61,14 +61,14 @@ namespace Bone_King
             facingRight = true;
         }
 
-        public void Update(Input currentInput, Input oldInput, Background background, GameValues gameValues, int maxX, Game1 game)
+        public void Update(Input currentInput, Input oldInput, Level background, GameValues gameValues, int maxX, Game1 game)
         {
-            if (animState != AnimState.Death)
+            if (state != State.Death)
             {
                 feetCollisionCheck = false;
 
                 //Gravity
-                if (velocity.Y < GRAVITY * 30 && animState != AnimState.Climbing && animState != AnimState.ClimbingOver)
+                if (velocity.Y < GRAVITY * 30 && state != State.Climbing && state != State.ClimbingOver)
                 {
                     velocity.Y += GRAVITY;
                 }
@@ -82,7 +82,7 @@ namespace Bone_King
                         if (velocity.Y >= 0)
                         {
                             velocity.Y = 0;
-                            if (animState != AnimState.Climbing && animState != AnimState.ClimbingOver)
+                            if (state != State.Climbing && state != State.ClimbingOver)
                             {
                                 position.Y = background.platformHitBoxes[i].Top - collision.Height + 1;
                             }
@@ -91,31 +91,31 @@ namespace Bone_King
                 }
 
                 //Jumping
-                if (currentInput.action && feetCollisionCheck && animState != AnimState.ClimbingOver && holdingAxe == false)
+                if (currentInput.action && feetCollisionCheck && state != State.ClimbingOver && holdingAxe == false)
                 {
                     if (currentInput.left)
                     {
-                        animState = AnimState.JumpingLeft;
+                        state = State.JumpingLeft;
                         velocity.Y = JUMPHEIGHT;
                         velocity.X = -JUMPSPEED;
                         facingRight = false;
                     }
                     else if (currentInput.right)
                     {
-                        animState = AnimState.JumpingRight;
+                        state = State.JumpingRight;
                         velocity.Y = JUMPHEIGHT;
                         velocity.X = JUMPSPEED;
                         facingRight = true;
                     }
                     else if (facingRight)
                     {
-                        animState = AnimState.JumpingRight;
+                        state = State.JumpingRight;
                         velocity.Y = JUMPHEIGHT;
                         velocity.X = 0;
                     }
                     else
                     {
-                        animState = AnimState.JumpingLeft;
+                        state = State.JumpingLeft;
                         velocity.Y = JUMPHEIGHT;
                         velocity.X = 0;
                     }
@@ -123,30 +123,30 @@ namespace Bone_King
 
                 #region Horizontal Movement
                 //Run Left
-                if (currentInput.left && feetCollisionCheck && currentInput.action == false && animState != AnimState.Climbing && animState != AnimState.ClimbingOver)
+                if (currentInput.left && feetCollisionCheck && currentInput.action == false && state != State.Climbing && state != State.ClimbingOver)
                 {
                     velocity.X = -RUNSPEED;
-                    animState = AnimState.RunningLeft;
+                    state = State.RunningLeft;
                     facingRight = false;
                 }
                 //Run Right
-                else if (currentInput.right && feetCollisionCheck && currentInput.action == false && animState != AnimState.Climbing && animState != AnimState.ClimbingOver)
+                else if (currentInput.right && feetCollisionCheck && currentInput.action == false && state != State.Climbing && state != State.ClimbingOver)
                 {
                     velocity.X = RUNSPEED;
-                    animState = AnimState.RunningRight;
+                    state = State.RunningRight;
                     facingRight = true;
                 }
                 //Stand Right
-                else if (feetCollisionCheck && currentInput.action == false && facingRight && animState != AnimState.Climbing && animState != AnimState.ClimbingOver)
+                else if (feetCollisionCheck && currentInput.action == false && facingRight && state != State.Climbing && state != State.ClimbingOver)
                 {
                     velocity.X = 0;
-                    animState = AnimState.StandingRight;
+                    state = State.StandingRight;
                 }
                 //Stand Left
-                else if (feetCollisionCheck && currentInput.action == false && facingRight == false && animState != AnimState.Climbing && animState != AnimState.ClimbingOver)
+                else if (feetCollisionCheck && currentInput.action == false && facingRight == false && state != State.Climbing && state != State.ClimbingOver)
                 {
                     velocity.X = 0;
-                    animState = AnimState.StandingLeft;
+                    state = State.StandingLeft;
                 }
                 #endregion
 
@@ -154,11 +154,11 @@ namespace Bone_King
                 //Climb ladder up if infront of ladder and pressing correct button
                 for (int i = 0; i < background.ladderHitBoxes.Length; i++)
                 {
-                    if (currentInput.up && feetCollisionCheck && collision.Intersects(background.ladderHitBoxes[i]) && collision.X + (collision.Width / 2) > background.ladderHitBoxes[i].X && collision.X + (collision.Width / 2) < background.ladderHitBoxes[i].X + background.ladderHitBoxes[i].Width && animState != AnimState.ClimbingOver && animState != AnimState.JumpingLeft && animState != AnimState.JumpingRight && holdingAxe == false)
+                    if (currentInput.up && feetCollisionCheck && collision.Intersects(background.ladderHitBoxes[i]) && collision.X + (collision.Width / 2) > background.ladderHitBoxes[i].X && collision.X + (collision.Width / 2) < background.ladderHitBoxes[i].X + background.ladderHitBoxes[i].Width && state != State.ClimbingOver && state != State.JumpingLeft && state != State.JumpingRight && holdingAxe == false)
                     {
                         frameTimer = 0;
                         feetCollisionCheck = false;
-                        animState = AnimState.Climbing;
+                        state = State.Climbing;
                         position.X = background.ladderHitBoxes[i].Center.X - (source.Width / 2);
                         position.Y -= 1;
                         velocity.X = 0;
@@ -167,11 +167,11 @@ namespace Bone_King
                 //Climb ladder down if above ladder and pressing correct button
                 for (int i = 0; i < background.ladderTops.Length; i++)
                 {
-                    if (currentInput.down && feetCollisionCheck && feetRectangle.Intersects(background.ladderTops[i]) && !background.brokenLadder[i] && collision.X + (collision.Width / 2) > background.ladderTops[i].X + (background.ladderTops[i].Width / 3) && collision.X + (collision.Width / 2) < background.ladderTops[i].X + ((background.ladderTops[i].Width / 3) * 2) && animState != AnimState.ClimbingOver && animState != AnimState.JumpingLeft && animState != AnimState.JumpingRight && holdingAxe == false)
+                    if (currentInput.down && feetCollisionCheck && feetRectangle.Intersects(background.ladderTops[i]) && !background.brokenLadder[i] && collision.X + (collision.Width / 2) > background.ladderTops[i].X + (background.ladderTops[i].Width / 3) && collision.X + (collision.Width / 2) < background.ladderTops[i].X + ((background.ladderTops[i].Width / 3) * 2) && state != State.ClimbingOver && state != State.JumpingLeft && state != State.JumpingRight && holdingAxe == false)
                     {
                         frameTimer = 0;
                         feetCollisionCheck = false;
-                        animState = AnimState.Climbing;
+                        state = State.Climbing;
                         position.X = background.ladderHitBoxes[i].Center.X - (source.Width / 2);
                         position.Y += 17;
                         velocity.X = 0;
@@ -180,7 +180,7 @@ namespace Bone_King
                 #endregion
 
                 //Moves Barry on the ladder
-                if (animState == AnimState.Climbing)
+                if (state == State.Climbing)
                 {
                     if (currentInput.up)
                     {
@@ -265,13 +265,13 @@ namespace Bone_King
                             if (atLadderTop && feetRectangle.Y <= (background.ladderHitBoxes[i].Y + background.ladderHitBoxes[i].Height / 2) && currentInput.up)
                             {
                                 //m_position.Y += 16;
-                                animState = AnimState.ClimbingOver;
+                                state = State.ClimbingOver;
                                 frame = 0;
                                 frameTimer = LADDERANIMATIONSPEED;
                             }
                             else if (feetCollisionCheck)
                             {
-                                animState = AnimState.StandingLeft;
+                                state = State.StandingLeft;
                             }
                         }
                     }
@@ -317,7 +317,7 @@ namespace Bone_King
                 }
 
                 //Resets and increases level by 1 each time Barry reaches the goal
-                if (collision.Intersects(background.goal) && animState != AnimState.Climbing && animState != AnimState.ClimbingOver && animState != AnimState.JumpingLeft && animState != AnimState.JumpingRight)
+                if (collision.Intersects(background.goal) && state != State.Climbing && state != State.ClimbingOver && state != State.JumpingLeft && state != State.JumpingRight)
                 {
                     gameValues.level += 1;
                     gameValues.score += (int)game.timer;
@@ -331,7 +331,7 @@ namespace Bone_King
                 position += velocity;
 
                 #region Sets size/position of collision rectangles depending on the Animation State
-                if (animState == AnimState.StandingRight || animState == AnimState.StandingLeft)
+                if (state == State.StandingRight || state == State.StandingLeft)
                 {
                     collision = new Rectangle((int)position.X + 4, (int)position.Y, 24, 32);
                     feetRectangle.X = (int)position.X + 4;
@@ -381,7 +381,7 @@ namespace Bone_King
                         source.Height = 48;
                     }
                 }
-                if (animState == AnimState.RunningRight || animState == AnimState.RunningLeft)
+                if (state == State.RunningRight || state == State.RunningLeft)
                 {
                     collision.X = (int)position.X + 1;
                     collision.Y = (int)position.Y;
@@ -433,7 +433,7 @@ namespace Bone_King
                         source.Height = 48;
                     }
                 }
-                if (animState == AnimState.JumpingRight || animState == AnimState.JumpingLeft)
+                if (state == State.JumpingRight || state == State.JumpingLeft)
                 {
                     collision.X = (int)position.X + 2;
                     collision.Y = (int)position.Y;
@@ -463,7 +463,7 @@ namespace Bone_King
                     source.Width = 32;
                     source.Height = 32;
                 }
-                if (animState == AnimState.Climbing)
+                if (state == State.Climbing)
                 {
                     collision.X = (int)position.X + 3;
                     collision.Y = (int)position.Y - 2;
@@ -493,7 +493,7 @@ namespace Bone_King
                     source.Width = 32;
                     source.Height = 32;
                 }
-                if (animState == AnimState.ClimbingOver)
+                if (state == State.ClimbingOver)
                 {
                     collision.X = (int)position.X;
                     collision.Y = (int)position.Y;
@@ -540,7 +540,7 @@ namespace Bone_King
 
         public void Reset(int x, int y)
         {
-            animState = AnimState.StandingRight;
+            state = State.StandingRight;
 
             position = new Vector2(x, y);
             velocity = Vector2.Zero;
@@ -565,7 +565,7 @@ namespace Bone_King
         {
             if (game.paused == false)
             {
-                if (animState == AnimState.Death)
+                if (state == State.Death)
                 {
                     if (deathStage == 0)
                     {
@@ -616,9 +616,9 @@ namespace Bone_King
         public void Draw(SpriteBatch sb, Game1 game)
         {
             #region Draws based on animState
-            switch (animState)
+            switch (state)
             {
-                case AnimState.StandingRight:
+                case State.StandingRight:
                     if (holdingAxe)
                     {
                         sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(0, 16), 1, SpriteEffects.FlipHorizontally, 0.9f);
@@ -628,7 +628,7 @@ namespace Bone_King
                         sb.Draw(running, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
                     }
                     break;
-                case AnimState.StandingLeft:
+                case State.StandingLeft:
                     if (holdingAxe)
                     {
                         sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(20, 16), 1, SpriteEffects.None, 0.9f);
@@ -638,7 +638,7 @@ namespace Bone_King
                         sb.Draw(running, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     }
                     break;
-                case AnimState.RunningRight:
+                case State.RunningRight:
                     if (holdingAxe)
                     {
                         sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(0, 16), 1, SpriteEffects.FlipHorizontally, 0.9f);
@@ -664,7 +664,7 @@ namespace Bone_King
                         }
                     }
                     break;
-                case AnimState.RunningLeft:
+                case State.RunningLeft:
                     if (holdingAxe)
                     {
                         sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(20, 16), 1, SpriteEffects.None, 0.9f);
@@ -690,13 +690,13 @@ namespace Bone_King
                         }
                     }
                     break;
-                case AnimState.JumpingRight:
+                case State.JumpingRight:
                     sb.Draw(jumping, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
                     break;
-                case AnimState.JumpingLeft:
+                case State.JumpingLeft:
                     sb.Draw(jumping, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     break;
-                case AnimState.Climbing:
+                case State.Climbing:
                     if (facingRight)
                     {
                         sb.Draw(climbing, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
@@ -706,7 +706,7 @@ namespace Bone_King
                         sb.Draw(climbing, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
                     }
                     break;
-                case AnimState.ClimbingOver:
+                case State.ClimbingOver:
                     sb.Draw(climbingOver, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     if (game.paused == false)
                     {
@@ -717,10 +717,10 @@ namespace Bone_King
                             {
                                 frameTimer = 0;
                                 source.X = 0;
-                                animState = AnimState.StandingLeft;
+                                state = State.StandingLeft;
                                 frame = 0;
                             }
-                            if (frame == 0 && animState != AnimState.StandingLeft)
+                            if (frame == 0 && state != State.StandingLeft)
                             {
                                 position.Y -= 4;
                             }
@@ -737,7 +737,7 @@ namespace Bone_King
                         }
                     }
                     break;
-                case AnimState.Death:
+                case State.Death:
                     if (deathStage == 0)
                     {
                         if (source.X % 32 != 0)

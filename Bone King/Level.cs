@@ -4,14 +4,14 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Bone_King
 {
     //This object is the background and collisions of the level itself
-    class Background
+    class Level
     {
         Texture2D texture;
         public Rectangle[] platformHitBoxes, ladderHitBoxes, ladderTops;
         public Rectangle goal;
         public bool[] brokenLadder;
 
-        public Background(Texture2D texture)
+        public Level(Texture2D texture)
         {
             this.texture = texture;
 

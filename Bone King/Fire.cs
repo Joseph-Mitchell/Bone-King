@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Bone_King
 {
-    class Fire : AnimatedObject
+    class Fire : AnimatedSprite
     {
         public Rectangle collision;
 

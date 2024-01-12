@@ -13,7 +13,7 @@ namespace Bone_King
 
         int frameTimer;
         bool collisionCheck, collisionCheckOld;
-        public bool isActive;
+        public bool active;
 
         const int ANIMATIONSPEED = 4;
         const float GRAVITY = 0.1f;
@@ -29,10 +29,10 @@ namespace Bone_King
             collision = new Rectangle(x + 4, y + 9, 42, 15);
 
             frameTimer = ANIMATIONSPEED;
-            isActive = true;
+            active = true;
         }
 
-        public void Update(GameTime gt, Background background, Game1 game)
+        public void Update(GameTime gt, Level background, Game1 game)
         {
             position += velocity;
             collisionCheck = false;

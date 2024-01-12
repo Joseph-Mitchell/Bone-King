@@ -6,7 +6,7 @@ namespace Bone_King
 {
     class BoneKing
     {
-        enum AnimState
+        enum State
         {
             Standing,
             Throwing,
@@ -14,7 +14,7 @@ namespace Bone_King
             SpecialBone
         }
 
-        AnimState animState;
+        State state;
 
         Texture2D standing, throwing, beatChest, special;
         Vector2 position;
@@ -30,7 +30,7 @@ namespace Bone_King
 
         public BoneKing(Texture2D standing, Texture2D throwing, Texture2D angery, Texture2D special, int x, int y)
         {
-            animState = AnimState.Standing;
+            state = State.Standing;
 
             this.standing = standing;
             this.throwing = throwing;
@@ -45,15 +45,15 @@ namespace Bone_King
 
         public void Update(GameTime gt, Random RNG, GameValues level)
         {
-            switch (animState)
+            switch (state)
             {
-                case AnimState.Standing:
+                case State.Standing:
                     if (frameTimer <= 0)
                     {
                         int randomAngry = RNG.Next(0, 4);
                         if (randomAngry == 0 && wasAngry == false && level.level < 5)
                         {
-                            animState = AnimState.BeatChest;
+                            state = State.BeatChest;
                             frameTimer = 30;
                         }
                         else
@@ -61,12 +61,12 @@ namespace Bone_King
                             int randomSpecial = RNG.Next(0, 20);
                             if (randomSpecial == 0 || firstBone == false)
                             {
-                                animState = AnimState.SpecialBone;
+                                state = State.SpecialBone;
                                 frameTimer = (ANIMATIONSPEED * 2) / level.multiplier;
                             }
                             else
                             {
-                                animState = AnimState.Throwing;
+                                state = State.Throwing;
                                 frameTimer = (ANIMATIONSPEED * 2) / level.multiplier;
                                 wasAngry = false;
                             }
@@ -77,14 +77,14 @@ namespace Bone_King
                         frameTimer -= 1;
                     }
                     break;
-                case AnimState.Throwing:
+                case State.Throwing:
                     if (frameTimer <= 0)
                     {
                       source.X += source.Width;
                       if (source.X >= throwing.Width)
                       {
                             source.X = 0;
-                            animState = AnimState.Standing;
+                            state = State.Standing;
                             boneDrop = true;
                       }
                       frameTimer = (ANIMATIONSPEED * 2) / level.multiplier;
@@ -94,7 +94,7 @@ namespace Bone_King
                         frameTimer -= 1;
                     }
                     break;
-                case AnimState.BeatChest:
+                case State.BeatChest:
                     if (frameTimer <= 0)
                     {
                         source.X += source.Width;
@@ -107,7 +107,7 @@ namespace Bone_King
                         if (angryCounter == 2)
                         {
                             source.X = 0;
-                            animState = AnimState.Standing;
+                            state = State.Standing;
                             frameTimer = (ANIMATIONSPEED * 2) / level.multiplier;
                             angryCounter = 0;
                             wasAngry = true;
@@ -118,14 +118,14 @@ namespace Bone_King
                         frameTimer -= 1;
                     }
                     break;
-                case AnimState.SpecialBone:
+                case State.SpecialBone:
                     if (frameTimer <= 0)
                     {
                         source.X += source.Width;
                         if (source.X >= 184)
                         {
                             source.X = 0;
-                            animState = AnimState.Standing;
+                            state = State.Standing;
                             specialBoneDrop = true;
                             firstBone = true;
                         }
@@ -138,7 +138,7 @@ namespace Bone_King
                     break;
             }
 
-            if (animState == AnimState.BeatChest)
+            if (state == State.BeatChest)
             {
                 source.Width = 92;
                 source.Height = 70;
@@ -154,11 +154,11 @@ namespace Bone_King
         {
             if (vals.level < 5)
             {
-                animState = AnimState.Standing;
+                state = State.Standing;
             }
             else
             {
-                animState = AnimState.SpecialBone;
+                state = State.SpecialBone;
             }
 
             source = new Rectangle(0, 0, 95, 77);
@@ -170,18 +170,18 @@ namespace Bone_King
 
         public void Draw(SpriteBatch sb)
         {
-            switch (animState)
+            switch (state)
             {
-                case AnimState.Standing:
+                case State.Standing:
                     sb.Draw(standing, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     break;
-                case AnimState.Throwing:
+                case State.Throwing:
                     sb.Draw(throwing, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     break;
-                case AnimState.BeatChest:
+                case State.BeatChest:
                     sb.Draw(beatChest, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     break;
-                case AnimState.SpecialBone:
+                case State.SpecialBone:
                     sb.Draw(special, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     break;
             }

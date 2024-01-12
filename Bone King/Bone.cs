@@ -25,7 +25,7 @@ namespace Bone_King
 
         float frameTimer;
         bool collisionCheck, ladderCheck;
-        public bool isActive;
+        public bool active;
 
         const int ANIMATIONSPEED = 4;
         const float GRAVITY = 0.1f, BONESPEED = 1.5f;
@@ -46,10 +46,10 @@ namespace Bone_King
             animState = State.RollingRight;
 
             frameTimer = ANIMATIONSPEED;
-            isActive = true;
+            active = true;
         }
 
-        public void Update(GameTime gt, Background background, Random RNG, GameValues level)
+        public void Update(GameTime gt, Level background, Random RNG, GameValues level)
         {
             position += velocity;
             collisionCheck = false;
