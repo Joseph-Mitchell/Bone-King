@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Reflection.Emit;
 
 namespace Bone_King
 {
@@ -25,12 +26,12 @@ namespace Bone_King
         Rectangle source, feetRectangle, ladderRectangle;
         public Rectangle collision, axeCollision;
 
-        int frameTimer, frame, deathTimer, deathStage, axeSwingTimer, axeTotalTimer;
+        int frameTimer, frame, deathTimer, deathStage, axeSwingTimer, axeTotalTimer, climbedLadder;
         bool feetCollisionCheck, facingRight, ladderIntersect, atLadderTop;
         public bool reset, holdingAxe, axeDown;
 
         const int ANIMATIONSPEED = 3, LADDERANIMATIONSPEED = 8, DEATHANIMATIONSPEED = 8, AXESPEED = 15, AXETIME = 400;
-        const float GRAVITY = 0.1f, RUNSPEED = 1.5f, JUMPHEIGHT = -2.0f, JUMPSPEED = 1.5f;
+        const float GRAVITY = 0.1f, MAXFALL = 3.0f, RUNSPEED = 1.5f, JUMPHEIGHT = -2.0f, JUMPSPEED = 1.5f;
 
         public Barry(Texture2D running, Texture2D axe, Texture2D jumping, Texture2D climbing, Texture2D climbingover, Texture2D death, int x, int y)
         {
@@ -61,22 +62,33 @@ namespace Bone_King
             facingRight = true;
         }
 
-        public void Update(Input currentInput, Input oldInput, Level background, GameValues gameValues, int maxX, Game1 game)
+        private void StartLadderClimb(float xPos, float yPos, int ladder)
+        {
+            frameTimer = 0;
+            feetCollisionCheck = false;
+            state = State.Climbing;
+            velocity.X = 0;
+            position.X = xPos;
+            position.Y = yPos;
+            climbedLadder = ladder;
+        }
+
+        public void Update(Input currentInput, Input oldInput, Level level, GameValues gameValues, int maxX, Game1 game)
         {
             if (state != State.Death)
             {
                 feetCollisionCheck = false;
 
                 //Gravity
-                if (velocity.Y < GRAVITY * 30 && state != State.Climbing && state != State.ClimbingOver)
+                if (velocity.Y < MAXFALL && state != State.Climbing && state != State.ClimbingOver)
                 {
                     velocity.Y += GRAVITY;
                 }
 
-                //Checks if Barry is touching the ground
-                for (int i = 0; i < background.platformHitBoxes.Length; i++)
+                //Checks if player is touching the ground
+                for (int i = 0; i < level.platformHitBoxes.Length; i++)
                 {
-                    if (background.platformHitBoxes[i].Intersects(feetRectangle))
+                    if (level.platformHitBoxes[i].Intersects(feetRectangle))
                     {
                         feetCollisionCheck = true;
                         if (velocity.Y >= 0)
@@ -84,138 +96,118 @@ namespace Bone_King
                             velocity.Y = 0;
                             if (state != State.Climbing && state != State.ClimbingOver)
                             {
-                                position.Y = background.platformHitBoxes[i].Top - collision.Height + 1;
+                                position.Y = level.platformHitBoxes[i].Top - collision.Height + 1;
                             }
                         }
                     }
                 }
 
-                //Jumping
-                if (currentInput.action && feetCollisionCheck && state != State.ClimbingOver && holdingAxe == false)
+                //Running and Jumping
+                if (feetCollisionCheck && state != State.Climbing && state != State.ClimbingOver)
                 {
-                    if (currentInput.left)
+                    if (currentInput.action && !holdingAxe)
                     {
-                        state = State.JumpingLeft;
-                        velocity.Y = JUMPHEIGHT;
-                        velocity.X = -JUMPSPEED;
-                        facingRight = false;
-                    }
-                    else if (currentInput.right)
-                    {
-                        state = State.JumpingRight;
-                        velocity.Y = JUMPHEIGHT;
-                        velocity.X = JUMPSPEED;
-                        facingRight = true;
-                    }
-                    else if (facingRight)
-                    {
-                        state = State.JumpingRight;
-                        velocity.Y = JUMPHEIGHT;
-                        velocity.X = 0;
+                        #region Jumping
+                        //Jump Left
+                        if (currentInput.left)
+                        {
+                            state = State.JumpingLeft;
+                            velocity.Y = JUMPHEIGHT;
+                            velocity.X = -JUMPSPEED;
+                            facingRight = false;
+                        }
+                        //Jump Right
+                        else if (currentInput.right)
+                        {
+                            state = State.JumpingRight;
+                            velocity.Y = JUMPHEIGHT;
+                            velocity.X = JUMPSPEED;
+                            facingRight = true;
+                        }
+                        //Jump Up
+                        else if (facingRight)
+                        {
+                            state = State.JumpingRight;
+                            velocity.Y = JUMPHEIGHT;
+                            velocity.X = 0;
+                        }
+                        else
+                        {
+                            state = State.JumpingLeft;
+                            velocity.Y = JUMPHEIGHT;
+                            velocity.X = 0;
+                        }
+                        #endregion
                     }
                     else
                     {
-                        state = State.JumpingLeft;
-                        velocity.Y = JUMPHEIGHT;
-                        velocity.X = 0;
+                        #region Running
+                        //Run Left
+                        if (currentInput.left)
+                        {
+                            velocity.X = -RUNSPEED;
+                            state = State.RunningLeft;
+                            facingRight = false;
+                        }
+                        //Run Right
+                        else if (currentInput.right)
+                        {
+                            velocity.X = RUNSPEED;
+                            state = State.RunningRight;
+                            facingRight = true;
+                        }
+                        //Stand Right
+                        else if (facingRight)
+                        {
+                            velocity.X = 0;
+                            state = State.StandingRight;
+                        }
+                        //Stand Left
+                        else if (!facingRight)
+                        {
+                            velocity.X = 0;
+                            state = State.StandingLeft;
+                        }
+                        #endregion
                     }
                 }
-
-                #region Horizontal Movement
-                //Run Left
-                if (currentInput.left && feetCollisionCheck && currentInput.action == false && state != State.Climbing && state != State.ClimbingOver)
-                {
-                    velocity.X = -RUNSPEED;
-                    state = State.RunningLeft;
-                    facingRight = false;
-                }
-                //Run Right
-                else if (currentInput.right && feetCollisionCheck && currentInput.action == false && state != State.Climbing && state != State.ClimbingOver)
-                {
-                    velocity.X = RUNSPEED;
-                    state = State.RunningRight;
-                    facingRight = true;
-                }
-                //Stand Right
-                else if (feetCollisionCheck && currentInput.action == false && facingRight && state != State.Climbing && state != State.ClimbingOver)
-                {
-                    velocity.X = 0;
-                    state = State.StandingRight;
-                }
-                //Stand Left
-                else if (feetCollisionCheck && currentInput.action == false && facingRight == false && state != State.Climbing && state != State.ClimbingOver)
-                {
-                    velocity.X = 0;
-                    state = State.StandingLeft;
-                }
-                #endregion
 
                 #region Climb Ladder
-                //Climb ladder up if infront of ladder and pressing correct button
-                for (int i = 0; i < background.ladderHitBoxes.Length; i++)
+                //Start climbing ladder up or down if infront of ladder and pressing correct button
+                if (feetCollisionCheck && state != State.ClimbingOver && !holdingAxe)
                 {
-                    if (currentInput.up && feetCollisionCheck && collision.Intersects(background.ladderHitBoxes[i]) && collision.X + (collision.Width / 2) > background.ladderHitBoxes[i].X && collision.X + (collision.Width / 2) < background.ladderHitBoxes[i].X + background.ladderHitBoxes[i].Width && state != State.ClimbingOver && state != State.JumpingLeft && state != State.JumpingRight && holdingAxe == false)
+                    for (int i = 0; i < level.ladders.Length; i++)
                     {
-                        frameTimer = 0;
-                        feetCollisionCheck = false;
-                        state = State.Climbing;
-                        position.X = background.ladderHitBoxes[i].Center.X - (source.Width / 2);
-                        position.Y -= 1;
-                        velocity.X = 0;
+                        if (currentInput.up && collision.Intersects(level.ladders[i].Body))
+                        {
+                            StartLadderClimb(level.ladders[i].Body.Center.X - (source.Width / 2), position.Y - 1, i);
+                        }
+                        if (currentInput.down && feetRectangle.Intersects(level.ladders[i].Top))
+                        {
+                            StartLadderClimb(level.ladders[i].Top.Center.X - (source.Width / 2), position.Y + 17, i);
+                        }
                     }
                 }
-                //Climb ladder down if above ladder and pressing correct button
-                for (int i = 0; i < background.ladderTops.Length; i++)
-                {
-                    if (currentInput.down && feetCollisionCheck && feetRectangle.Intersects(background.ladderTops[i]) && !background.brokenLadder[i] && collision.X + (collision.Width / 2) > background.ladderTops[i].X + (background.ladderTops[i].Width / 3) && collision.X + (collision.Width / 2) < background.ladderTops[i].X + ((background.ladderTops[i].Width / 3) * 2) && state != State.ClimbingOver && state != State.JumpingLeft && state != State.JumpingRight && holdingAxe == false)
-                    {
-                        frameTimer = 0;
-                        feetCollisionCheck = false;
-                        state = State.Climbing;
-                        position.X = background.ladderHitBoxes[i].Center.X - (source.Width / 2);
-                        position.Y += 17;
-                        velocity.X = 0;
-                    }
-                }
-                #endregion
 
-                //Moves Barry on the ladder
+                //Moves player on the ladder
                 if (state == State.Climbing)
                 {
+                    bool m_climbing = false;
+
                     if (currentInput.up)
                     {
                         position.Y -= RUNSPEED / 2;
-                        for (int i = 0; i < background.ladderHitBoxes.Length; i++)
-                        {
-                            if (collision.Intersects(background.ladderHitBoxes[i]))
-                            {
-                                if (frameTimer <= 0)
-                                {
-                                    if (facingRight)
-                                    {
-                                        facingRight = false;
-                                    }
-                                    else
-                                    {
-                                        facingRight = true;
-                                    }
-
-                                    frameTimer = ANIMATIONSPEED * 3;
-                                }
-                                else
-                                {
-                                    frameTimer -= 1;
-                                }
-                            }
-                            else
-                            {
-                                frame = 0;
-                            }
-                        }
+                        m_climbing = true;
                     }
                     if (currentInput.down)
                     {
                         position.Y += RUNSPEED / 2;
+                        m_climbing = true;
+                    }
+
+                    //Flips sprite left and right while climbing
+                    if (m_climbing)
+                    {
                         if (frameTimer <= 0)
                         {
                             if (facingRight)
@@ -226,7 +218,6 @@ namespace Bone_King
                             {
                                 facingRight = true;
                             }
-
                             frameTimer = ANIMATIONSPEED * 3;
                         }
                         else
@@ -236,47 +227,26 @@ namespace Bone_King
                     }
 
                     //Moves Barry down if he starts to go above the climbable section of any of the broken ladders
-                    ladderIntersect = false;
-                    for (int i = 0; i < background.ladderHitBoxes.Length; i++)
-                    {
-                        if (collision.Intersects(background.ladderHitBoxes[i]))
-                        {
-                            ladderIntersect = true;
-                        }
-                    }
-                    if (ladderIntersect == false)
+                    if (!collision.Intersects(level.ladders[climbedLadder].Body))
                     {
                         position.Y += RUNSPEED / 2;
                     }
 
                     //Makes Barry "Climb Over" the platform when he reaches the top of the ladder
-                    atLadderTop = false;
-                    for (int i = 0; i < background.platformHitBoxes.Length; i++)
+                    if (ladderRectangle.Intersects(level.ladders[climbedLadder].Top) && currentInput.up)
                     {
-                        if (ladderRectangle.Intersects(background.platformHitBoxes[i]))
-                        {
-                            atLadderTop = true;
-                        }
+                        state = State.ClimbingOver;
+                        frame = 0;
+                        frameTimer = LADDERANIMATIONSPEED;
                     }
-                    for (int i = 0; i < background.ladderHitBoxes.Length; i++)
+                    else if (feetCollisionCheck)
                     {
-                        if (feetRectangle.Intersects(background.ladderHitBoxes[i]))
-                        {
-                            if (atLadderTop && feetRectangle.Y <= (background.ladderHitBoxes[i].Y + background.ladderHitBoxes[i].Height / 2) && currentInput.up)
-                            {
-                                //m_position.Y += 16;
-                                state = State.ClimbingOver;
-                                frame = 0;
-                                frameTimer = LADDERANIMATIONSPEED;
-                            }
-                            else if (feetCollisionCheck)
-                            {
-                                state = State.StandingLeft;
-                            }
-                        }
+                        state = State.StandingLeft;
                     }
                 }
+                #endregion
 
+                #region Axe
                 //Times the axe swing
                 if (axeSwingTimer <= 0)
                 {
@@ -305,6 +275,7 @@ namespace Bone_King
                         axeTotalTimer -= 1;
                     }
                 }
+                #endregion
 
                 //Stops Barry from going off the screen
                 if (collision.X + collision.Width > maxX)
@@ -317,7 +288,7 @@ namespace Bone_King
                 }
 
                 //Resets and increases level by 1 each time Barry reaches the goal
-                if (collision.Intersects(background.goal) && state != State.Climbing && state != State.ClimbingOver && state != State.JumpingLeft && state != State.JumpingRight)
+                if (collision.Intersects(level.goal) && state != State.Climbing && state != State.ClimbingOver && state != State.JumpingLeft && state != State.JumpingRight)
                 {
                     gameValues.level += 1;
                     gameValues.score += (int)game.timer;

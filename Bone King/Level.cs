@@ -3,11 +3,22 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Bone_King
 {
-    //This object is the background and collisions of the level itself
+    public struct Ladder
+    {
+        public Ladder(int xPos, int yPos, int topPos, int height)
+        {
+            Body = new Rectangle(xPos, yPos, 16, height);
+            Top = new Rectangle(xPos, topPos, 16, 18);
+        }
+
+        public Rectangle Body { get; }
+        public Rectangle Top { get; }
+    }
     class Level
     {
         Texture2D texture;
-        public Rectangle[] platformHitBoxes, ladderHitBoxes, ladderTops;
+        public Rectangle[] platformHitBoxes;
+        public Ladder[] ladders;
         public Rectangle goal;
         public bool[] brokenLadder;
 
@@ -16,8 +27,7 @@ namespace Bone_King
             this.texture = texture;
 
             platformHitBoxes = new Rectangle[49];
-            ladderHitBoxes = new Rectangle[13];
-            ladderTops = new Rectangle[12];
+            ladders = new Ladder[13];
             goal = new Rectangle(208, 0, 96, 63);
             brokenLadder = new bool[13];
 
@@ -86,38 +96,21 @@ namespace Bone_King
             platformHitBoxes[48] = new Rectangle(208, 63, 96, 3);
             #endregion
 
-            #region Ladder Hitboxes
-            ladderHitBoxes[0] = new Rectangle(210, 390, 16, 25);
-            ladderHitBoxes[1] = new Rectangle(382, 360, 16, 49);
-            ladderHitBoxes[2] = new Rectangle(238, 326, 16, 25);
-            ladderHitBoxes[3] = new Rectangle(94, 302, 16, 43);
-            ladderHitBoxes[4] = new Rectangle(172, 270, 16, 25);
-            ladderHitBoxes[5] = new Rectangle(270, 266, 16, 25);
-            ladderHitBoxes[6] = new Rectangle(382, 240, 16, 47);
-            ladderHitBoxes[7] = new Rectangle(334, 210, 16, 25);
-            ladderHitBoxes[8] = new Rectangle(188, 178, 16, 51);
-            ladderHitBoxes[9] = new Rectangle(94, 182, 16, 43);
-            ladderHitBoxes[10] = new Rectangle(228, 148, 16, 25);
-            ladderHitBoxes[11] = new Rectangle(382, 120, 16, 47);
-            ladderHitBoxes[12] = new Rectangle(288, 66, 16, 47);
-            #endregion
+            ladders[0] = new Ladder(210, 390, 336, 25);
+            ladders[1] = new Ladder(382, 360, 342, 49);
+            ladders[2] = new Ladder(238, 326, 278, 25);
+            ladders[3] = new Ladder(94, 302, 284, 43);
+            ladders[4] = new Ladder(172, 270, 214, 25);
+            ladders[5] = new Ladder(270, 266, 218, 25);
+            ladders[6] = new Ladder(382, 240, 222, 47);
+            ladders[7] = new Ladder(334, 210, 154, 25);
+            ladders[8] = new Ladder(188, 178, 160, 51);
+            ladders[9] = new Ladder(94, 182, 164, 43);
+            ladders[10] = new Ladder(228, 148, 96, 25);
+            ladders[11] = new Ladder(382, 120, 102, 47);
+            ladders[12] = new Ladder(288, 66, 84, 47);
 
-            #region Ladder Tops
-            ladderTops[0] = new Rectangle(210, 336, 16, 18);
-            ladderTops[1] = new Rectangle(382, 342, 16, 18);
-            ladderTops[2] = new Rectangle(238, 278, 16, 18);
-            ladderTops[3] = new Rectangle(94, 284, 16, 18);
-            ladderTops[4] = new Rectangle(172, 214, 16, 18);
-            ladderTops[5] = new Rectangle(270, 218, 16, 18);
-            ladderTops[6] = new Rectangle(382, 222, 16, 18);
-            ladderTops[7] = new Rectangle(334, 154, 16, 18);
-            ladderTops[8] = new Rectangle(188, 160, 16, 18);
-            ladderTops[9] = new Rectangle(94, 164, 16, 18);
-            ladderTops[10] = new Rectangle(228, 96, 16, 18);
-            ladderTops[11] = new Rectangle(382, 102, 16, 18);
-            #endregion
-
-            for (int i = 0; i < ladderHitBoxes.Length; i++)
+            for (int i = 0; i < ladders.Length; i++)
             {
                 if(i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 10)
                 {
@@ -141,13 +134,13 @@ namespace Bone_King
             {
                 sb.Draw(hitBoxTexture, platformHitBoxes[i], Color.Red);
             }
-            for (int i = 0; i < ladderHitBoxes.Length; i++)
+            for (int i = 0; i < ladders.Length; i++)
             {
-                sb.Draw(hitBoxTexture, ladderHitBoxes[i], Color.Green);
+                sb.Draw(hitBoxTexture, ladders[i].Body, Color.Green);
             }
-            for (int i = 0; i < ladderTops.Length; i++)
+            for (int i = 0; i < ladders.Length; i++)
             {
-                sb.Draw(hitBoxTexture, ladderTops[i], null, Color.Blue, 0, Vector2.Zero, SpriteEffects.None, 1);
+                sb.Draw(hitBoxTexture, ladders[i].Top, null, Color.Blue, 0, Vector2.Zero, SpriteEffects.None, 1);
             }
             sb.Draw(hitBoxTexture, goal, null, Color.Yellow, 0, Vector2.Zero, SpriteEffects.None, 0.1f);
         }

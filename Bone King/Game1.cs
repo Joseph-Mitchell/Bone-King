@@ -589,7 +589,7 @@ namespace Bone_King
                                     lives -= 1;
                                 }
                                 //Set a flag to true if player jumps over a bone
-                                if (bones[i].scoreRectangle.Intersects(player.collision) && (player.state == Barry.State.JumpingLeft || player.state == Barry.State.JumpingRight) && bones[i].animState != Bone.State.Ladder)
+                                if (bones[i].scoreCollision.Intersects(player.collision) && (player.state == Barry.State.JumpingLeft || player.state == Barry.State.JumpingRight) && bones[i].state != Bone.State.Ladder)
                                 {
                                     currentScoreCollision = true;
                                 }

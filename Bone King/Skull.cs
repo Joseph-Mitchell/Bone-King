@@ -64,23 +64,23 @@ namespace Bone_King
 
             //Chooses movement
             ladderIntersect = false;
-            for (int i = 0; i < background.ladderHitBoxes.Length; i++)
+            for (int i = 0; i < background.ladders.Length; i++)
             {
                 if (i != 0 && i != 2 && i != 4 && i != 5 && i != 7 && i != 10)
                 {
-                    if (collision.Intersects(background.ladderHitBoxes[i]) && collision.X + (collision.Width / 2) > background.ladderHitBoxes[i].X + (background.ladderHitBoxes[i].Width / 3) && collision.X + (collision.Width / 2) < background.ladderHitBoxes[i].X + ((background.ladderHitBoxes[i].Width / 3) * 2) && state != State.Ladder)
+                    if (collision.Intersects(background.ladders[i].Body) && collision.X + (collision.Width / 2) > background.ladders[i].Body.X + (background.ladders[i].Body.Width / 3) && collision.X + (collision.Width / 2) < background.ladders[i].Body.X + ((background.ladders[i].Body.Width / 3) * 2) && state != State.Ladder)
                     {
                         state = State.Ladder;
-                        position.X = background.ladderHitBoxes[i].X + (background.ladderHitBoxes[i].Width / 2) - (collision.Width / 2);
+                        position.X = background.ladders[i].Body.X + (background.ladders[i].Body.Width / 2) - (collision.Width / 2);
                     }
                 }
-                if (collision.Intersects(background.ladderHitBoxes[i]))
+                if (collision.Intersects(background.ladders[i].Body))
                 {
                     ladderIntersect = true;
                 }
             }
 
-            //Moves depending on animstate
+            //Moves depending on state
             if (state == State.Ladder && !ladderIntersect)
             {
                 state = State.None;
