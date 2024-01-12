@@ -68,9 +68,9 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AnimatedObject.cs" />
+    <Compile Include="AnimatedSprite.cs" />
     <Compile Include="Axe.cs" />
-    <Compile Include="Background.cs" />
+    <Compile Include="Level.cs" />
     <Compile Include="Barry.cs" />
     <Compile Include="BoneKing.cs" />
     <Compile Include="Bone.cs" />
