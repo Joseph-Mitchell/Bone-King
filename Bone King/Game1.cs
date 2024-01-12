@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
+using System;
+using System.Collections.Generic;
 
 namespace Bone_King
 {
@@ -58,7 +58,7 @@ namespace Bone_King
         ParticleBurst particleBurst1, particleBurst2;
 
         //Structures
-        bool m_debugShow, m_currentScoreCollision, m_oldScoreCollision, m_introPlayed, m_cutscene2Played, m_finalScore, m_highScore, m_drum;
+        bool debugShow, currentScoreCollision, oldScoreCollision, introPlayed, cutscene2Played, finalScoreReady, highScore, drumPlayed;
         public bool paused;
         public float timer, finalScoreTimer, highScoreBlinkTimer;
         public int lives, instructionPage;
@@ -278,9 +278,9 @@ namespace Bone_King
             int potato = RNG.Next(0, 4);
             axes[potato].isActive = true;
 
-            m_debugShow = false;
-            m_currentScoreCollision = false;
-            m_oldScoreCollision = false;
+            debugShow = false;
+            currentScoreCollision = false;
+            oldScoreCollision = false;
             lives = 3;
             gameValues.level = 0;
             gameValues.score = (int)(gameValues.score * gameValues.multiplier);
@@ -443,15 +443,15 @@ namespace Bone_King
                 case GameState.Cutscene1:
                     if (introPlayer.State == MediaState.Stopped)
                     {
-                        if (!m_introPlayed)
+                        if (!introPlayed)
                         {
                             introPlayer.Play(introVideo);
-                            m_introPlayed = true;
+                            introPlayed = true;
                         }
                         else
                         {
                             gameState = GameState.Playing;
-                            m_introPlayed = false;
+                            introPlayed = false;
                         }
                     }
                     if (introInstance == null)
@@ -476,13 +476,13 @@ namespace Bone_King
                     //Toggles debug
                     if (currentInput.debug && oldInput.debug == false)
                     {
-                        if (m_debugShow)
+                        if (debugShow)
                         {
-                            m_debugShow = false;
+                            debugShow = false;
                         }
                         else
                         {
-                            m_debugShow = true;
+                            debugShow = true;
                         }
                     }
 #endif
@@ -562,7 +562,7 @@ namespace Bone_King
                         if (player.animState != Barry.AnimState.Death)
                         {
                             #region New Class Updates
-                            m_currentScoreCollision = false; //Resets the flag which tells the game to increase score when a bone is jumped over
+                            currentScoreCollision = false; //Resets the flag which tells the game to increase score when a bone is jumped over
 
                             #region Bone Updates
                             for (int i = 0; i < bones.Count; i++)
@@ -591,7 +591,7 @@ namespace Bone_King
                                 //Set a flag to true if player jumps over a bone
                                 if (bones[i].scoreRectangle.Intersects(player.collision) && (player.animState == Barry.AnimState.JumpingLeft || player.animState == Barry.AnimState.JumpingRight) && bones[i].animState != Bone.State.Ladder)
                                 {
-                                    m_currentScoreCollision = true;
+                                    currentScoreCollision = true;
                                 }
                             }
                             #endregion
@@ -643,7 +643,7 @@ namespace Bone_King
                             #endregion
 
                             //Adds score for jumping over bone if flags are correctly set. This stops multiple points from being gained for the same bone
-                            if (m_currentScoreCollision && m_oldScoreCollision == false)
+                            if (currentScoreCollision && oldScoreCollision == false)
                             {
                                 point.Play();
                                 gameValues.score += 100;
@@ -752,7 +752,7 @@ namespace Bone_King
                                 timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
                             }
 
-                            m_oldScoreCollision = m_currentScoreCollision;
+                            oldScoreCollision = currentScoreCollision;
                         }
                         player.DeathUpdate(this);
                     }
@@ -761,40 +761,40 @@ namespace Bone_King
                 case GameState.Cutscene2:
                     if (cutscene2Player.State == MediaState.Stopped)
                     {
-                        if (!m_cutscene2Played)
+                        if (!cutscene2Played)
                         {
                             cutscene2Player.Play(cutscene2);
-                            m_cutscene2Played = true;
+                            cutscene2Played = true;
                         }
                         else
                         {
                             gameState = GameState.Playing;
-                            m_cutscene2Played = false;
+                            cutscene2Played = false;
                         }
                     }
                     break;
                 //Game over screen
                 case GameState.GameOver:
-                    if (!m_finalScore)
+                    if (!finalScoreReady)
                     {
                         if (currentInput.action && !oldInput.action)
                         {
-                            m_finalScore = true;
+                            finalScoreReady = true;
                         }
                     }
                     else
                     {
-                        if (!m_drum)
+                        if (!drumPlayed)
                         {
                             drum.Play();
-                            m_drum = true;
+                            drumPlayed = true;
                         }
                         if (gameValues.score > gameValues.highScore)
                         {
                             gameValues.highScore = gameValues.score;
-                            m_highScore = true;
+                            highScore = true;
                         }
-                        if (m_highScore)
+                        if (highScore)
                         {
                             if (finalScoreTimer <= 80)
                             {
@@ -831,8 +831,8 @@ namespace Bone_King
                         {
                             gameValues.score = 0;
                             gameState = GameState.Menu;
-                            m_finalScore = false;
-                            m_drum = false;
+                            finalScoreReady = false;
+                            drumPlayed = false;
                             applauseInstance.Stop();
                             applauseInstance = null;
                             if (highScoreSongInstance != null)
@@ -841,11 +841,11 @@ namespace Bone_King
                                 highScoreSongInstance = null;
                             }
                             finalScoreTimer = 180;
-                            finalScore.m_position.Y = 0;
+                            finalScore.position.Y = 0;
                             highScoreBlinkTimer = HIGHSCOREBLINKTIME;
                             particleBurst1.burstDelay = particleBurst1.initialDelay;
                             particleBurst2.burstDelay = particleBurst1.initialDelay;
-                            m_highScore = false;
+                            highScore = false;
                         }
                     }
                     break;
@@ -960,19 +960,19 @@ namespace Bone_King
                     }
                     break;
                 case GameState.GameOver:
-                    if (!m_finalScore)
+                    if (!finalScoreReady)
                     {
                         gameOver.Draw(spriteBatch);
                     }
                     else
                     {
-                        if (m_highScore)
+                        if (highScore)
                         {
                             if (finalScoreTimer <= 80)
                             {
                                 particleBurst1.Draw(spriteBatch);
                                 particleBurst2.Draw(spriteBatch);
-                                finalScore.m_position.Y = -20;
+                                finalScore.position.Y = -20;
                                 finalScore.Draw(spriteBatch);
                                 spriteBatch.DrawString(mainFont, gameValues.score.ToString(), new Vector2(graphics.PreferredBackBufferWidth / 2, 224), Color.White, 0, new Vector2(mainFont.MeasureString(gameValues.score.ToString()).X / 2, mainFont.MeasureString(gameValues.score.ToString()).Y / 2), 1, SpriteEffects.None, 1);
                                 if (highScoreBlinkTimer >= HIGHSCOREBLINKTIME / 2)
@@ -1007,7 +1007,7 @@ namespace Bone_King
             }
 
 #if DEBUG
-            if (m_debugShow)
+            if (debugShow)
             {
                 background.DebugDraw(spriteBatch, hitBoxTexture);
                 for (int i = 0; i < bones.Count; i++)

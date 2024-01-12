@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace Bone_King
 {
@@ -16,15 +16,15 @@ namespace Bone_King
             Ladder
         }
 
-        Texture2D m_normalSprites, m_ladderSprites;
-        Vector2 m_position, m_velocity;
-        Rectangle m_source;
+        Texture2D normalSprites, ladderSprites;
+        Vector2 position, velocity;
+        Rectangle source;
         public Rectangle groundCollision, playerCollision, scoreRectangle;
 
         public State animState;
 
-        float m_frameTimer;
-        bool m_collisionCheck, m_ladderCheck;
+        float frameTimer;
+        bool collisionCheck, ladderCheck;
         public bool isActive;
 
         const int ANIMATIONSPEED = 4;
@@ -32,12 +32,12 @@ namespace Bone_King
 
         public Bone(Texture2D normal, Texture2D ladder, GameValues level, int x, int y)
         {
-            m_normalSprites = normal;
-            m_ladderSprites = ladder;
-            m_position = new Vector2(x, y);
-            m_velocity = Vector2.Zero;
+            normalSprites = normal;
+            ladderSprites = ladder;
+            position = new Vector2(x, y);
+            velocity = Vector2.Zero;
 
-            m_source = new Rectangle(0, 0, 33, 33);
+            source = new Rectangle(0, 0, 33, 33);
 
             groundCollision = new Rectangle(x - 7, y - 7, 15, 15);
             playerCollision = new Rectangle(x - 7, y - 7, 15, 15);
@@ -45,55 +45,55 @@ namespace Bone_King
 
             animState = State.RollingRight;
 
-            m_frameTimer = ANIMATIONSPEED;
+            frameTimer = ANIMATIONSPEED;
             isActive = true;
         }
 
         public void Update(GameTime gt, Background background, Random RNG, GameValues level)
         {
-            m_position += m_velocity;
-            m_collisionCheck = false;
+            position += velocity;
+            collisionCheck = false;
 
             //Checks if the bone is on any of the platforms or ladders
             for (int i = 0; i < background.ladderTops.Length; i++)
             {
-                if (groundCollision.Intersects(background.ladderTops[i]) && groundCollision.X + (groundCollision.Width / 2) > background.ladderTops[i].X + (background.ladderTops[i].Width / 3) && groundCollision.X + (groundCollision.Width / 2) < background.ladderTops[i].X + ((background.ladderTops[i].Width / 3) * 2) && m_ladderCheck == false)
+                if (groundCollision.Intersects(background.ladderTops[i]) && groundCollision.X + (groundCollision.Width / 2) > background.ladderTops[i].X + (background.ladderTops[i].Width / 3) && groundCollision.X + (groundCollision.Width / 2) < background.ladderTops[i].X + ((background.ladderTops[i].Width / 3) * 2) && ladderCheck == false)
                 {
                     int potato = RNG.Next(0, 8);
                     if (potato == 0)
                     {
-                        m_ladderCheck = true;
-                        m_position.X = background.ladderTops[i].X + (background.ladderTops[i].Width / 2);
-                        m_position.Y += 10;
+                        ladderCheck = true;
+                        position.X = background.ladderTops[i].X + (background.ladderTops[i].Width / 2);
+                        position.Y += 10;
                     }
                 }
             }
             for (int i = 0; i < background.platformHitBoxes.Length; i++)
             {
-                if (groundCollision.Intersects(background.platformHitBoxes[i]) && m_ladderCheck == false)
+                if (groundCollision.Intersects(background.platformHitBoxes[i]) && ladderCheck == false)
                 {
-                    m_collisionCheck = true;
-                    m_position.Y = background.platformHitBoxes[i].Y - 7;
+                    collisionCheck = true;
+                    position.Y = background.platformHitBoxes[i].Y - 7;
                 }
             }
 
             //Checks if the bone is at the bottom of a ladder
-            if (m_ladderCheck)
+            if (ladderCheck)
             {
-                m_ladderCheck = false;
+                ladderCheck = false;
                 for (int i = 0; i < background.ladderTops.Length; i++)
                 {
                     if (groundCollision.Intersects(background.ladderTops[i]))
                     {
-                        m_ladderCheck = true;
+                        ladderCheck = true;
                     }
                 }
             }
 
             //Changes state depending on bones position and collisions
-            if (m_collisionCheck && m_ladderCheck == false && animState != State.Ladder)
+            if (collisionCheck && ladderCheck == false && animState != State.Ladder)
             {
-                if ((m_position.Y >= 155 && m_position.Y <= 213) || (m_position.Y >= 275 && m_position.Y <= 329) || m_position.Y >= 397)
+                if ((position.Y >= 155 && position.Y <= 213) || (position.Y >= 275 && position.Y <= 329) || position.Y >= 397)
                 {
                     animState = State.RollingLeft;
                 }
@@ -102,13 +102,13 @@ namespace Bone_King
                     animState = State.RollingRight;
                 }
             }
-            else if (m_ladderCheck == false && animState != State.Ladder)
+            else if (ladderCheck == false && animState != State.Ladder)
             {
-                if ((m_position.Y >= 155 && m_position.Y <= 213) || (m_position.Y >= 275 && m_position.Y <= 329) || m_position.Y >= 397)
+                if ((position.Y >= 155 && position.Y <= 213) || (position.Y >= 275 && position.Y <= 329) || position.Y >= 397)
                 {
                     animState = State.FallingLeft;
                 }
-                else if (m_velocity.X > 0)
+                else if (velocity.X > 0)
                 {
                     animState = State.FallingRight;
                 }
@@ -119,122 +119,122 @@ namespace Bone_King
             }
 
             //Times the animation
-            if (m_frameTimer <= 0)
+            if (frameTimer <= 0)
             {
-                m_source.X = (m_source.X + m_source.Width);
+                source.X = (source.X + source.Width);
 
                 if (animState == State.Ladder)
                 {
-                    if (m_source.X >= m_ladderSprites.Width)
+                    if (source.X >= ladderSprites.Width)
                     {
-                        m_source.X = 0;
+                        source.X = 0;
                     }
                 }
                 else
                 {
-                    if (m_source.X >= m_normalSprites.Width)
+                    if (source.X >= normalSprites.Width)
                     {
-                        m_source.X = 0;
+                        source.X = 0;
                     }
                 }
 
-                m_frameTimer = ANIMATIONSPEED / level.multiplier;
+                frameTimer = ANIMATIONSPEED / level.multiplier;
             }
             else
             {
-                m_frameTimer -= 1;
+                frameTimer -= 1;
             }
 
             //Changes values depending on state
             switch (animState)
             {
                 case State.RollingLeft:
-                    m_velocity.X = -(BONESPEED * level.multiplier);
-                    m_velocity.Y = 0;
-                    m_source.Width = 33;
-                    m_source.Height = 33;
-                    if (m_source.X % 33 != 0)
+                    velocity.X = -(BONESPEED * level.multiplier);
+                    velocity.Y = 0;
+                    source.Width = 33;
+                    source.Height = 33;
+                    if (source.X % 33 != 0)
                     {
-                        m_source.X = 0;
+                        source.X = 0;
                     }
-                    groundCollision.X = (int)m_position.X - 7;
-                    groundCollision.Y = (int)m_position.Y - 7;
-                    playerCollision = new Rectangle((int)m_position.X - 7, (int)m_position.Y - 5, 15, 13);
-                    scoreRectangle = new Rectangle((int)m_position.X - 2, (int)m_position.Y - 27, 4, 20);
+                    groundCollision.X = (int)position.X - 7;
+                    groundCollision.Y = (int)position.Y - 7;
+                    playerCollision = new Rectangle((int)position.X - 7, (int)position.Y - 5, 15, 13);
+                    scoreRectangle = new Rectangle((int)position.X - 2, (int)position.Y - 27, 4, 20);
                     break;
                 case State.RollingRight:
-                    m_velocity.X = BONESPEED * level.multiplier;
-                    m_velocity.Y = 0;
-                    m_source.Width = 33;
-                    m_source.Height = 33;
-                    if (m_source.X % 33 != 0)
+                    velocity.X = BONESPEED * level.multiplier;
+                    velocity.Y = 0;
+                    source.Width = 33;
+                    source.Height = 33;
+                    if (source.X % 33 != 0)
                     {
-                        m_source.X = 0;
+                        source.X = 0;
                     }
-                    groundCollision.X = (int)m_position.X - 7;
-                    groundCollision.Y = (int)m_position.Y - 7;
-                    playerCollision = new Rectangle((int)m_position.X - 7, (int)m_position.Y - 5, 15, 13);
-                    scoreRectangle = new Rectangle((int)m_position.X - 2, (int)m_position.Y - 27, 4, 20);
+                    groundCollision.X = (int)position.X - 7;
+                    groundCollision.Y = (int)position.Y - 7;
+                    playerCollision = new Rectangle((int)position.X - 7, (int)position.Y - 5, 15, 13);
+                    scoreRectangle = new Rectangle((int)position.X - 2, (int)position.Y - 27, 4, 20);
                     break;
                 case State.FallingLeft:
-                    if (m_position.X + (groundCollision.Width / 2) < 64)
+                    if (position.X + (groundCollision.Width / 2) < 64)
                     {
-                        m_velocity.X = -(BONESPEED * level.multiplier) / 2;
+                        velocity.X = -(BONESPEED * level.multiplier) / 2;
                     }
                     else
                     {
-                        m_velocity.X = -(BONESPEED * level.multiplier);
+                        velocity.X = -(BONESPEED * level.multiplier);
                     }
-                    m_velocity.Y += GRAVITY * level.multiplier;
-                    m_source.Width = 33;
-                    m_source.Height = 33;
-                    if (m_source.X % 33 != 0)
+                    velocity.Y += GRAVITY * level.multiplier;
+                    source.Width = 33;
+                    source.Height = 33;
+                    if (source.X % 33 != 0)
                     {
-                        m_source.X = 0;
+                        source.X = 0;
                     }
-                    groundCollision.X = (int)m_position.X - 7;
-                    groundCollision.Y = (int)m_position.Y - 7;
-                    playerCollision = new Rectangle((int)m_position.X - 7, (int)m_position.Y - 5, 15, 13);
-                    scoreRectangle = new Rectangle((int)m_position.X - 2, (int)m_position.Y - 27, 4, 20);
+                    groundCollision.X = (int)position.X - 7;
+                    groundCollision.Y = (int)position.Y - 7;
+                    playerCollision = new Rectangle((int)position.X - 7, (int)position.Y - 5, 15, 13);
+                    scoreRectangle = new Rectangle((int)position.X - 2, (int)position.Y - 27, 4, 20);
                     break;
                 case State.FallingRight:
-                    if (m_position.X - (groundCollision.Width / 2) > 448)
+                    if (position.X - (groundCollision.Width / 2) > 448)
                     {
-                        m_velocity.X = (BONESPEED * level.multiplier) / 2;
+                        velocity.X = (BONESPEED * level.multiplier) / 2;
                     }
                     else
                     {
-                        m_velocity.X = BONESPEED * level.multiplier;
+                        velocity.X = BONESPEED * level.multiplier;
                     }
-                    m_velocity.Y += GRAVITY * level.multiplier;
-                    m_source.Width = 33;
-                    m_source.Height = 33;
-                    if (m_source.X % 33 != 0)
+                    velocity.Y += GRAVITY * level.multiplier;
+                    source.Width = 33;
+                    source.Height = 33;
+                    if (source.X % 33 != 0)
                     {
-                        m_source.X = 0;
+                        source.X = 0;
                     }
-                    groundCollision.X = (int)m_position.X - 7;
-                    groundCollision.Y = (int)m_position.Y - 7;
-                    playerCollision = new Rectangle((int)m_position.X - 7, (int)m_position.Y - 5, 15, 13);
-                    scoreRectangle = new Rectangle((int)m_position.X - 2, (int)m_position.Y - 27, 4, 20);
+                    groundCollision.X = (int)position.X - 7;
+                    groundCollision.Y = (int)position.Y - 7;
+                    playerCollision = new Rectangle((int)position.X - 7, (int)position.Y - 5, 15, 13);
+                    scoreRectangle = new Rectangle((int)position.X - 2, (int)position.Y - 27, 4, 20);
                     break;
                 case State.Ladder:
-                    m_velocity.X = 0;
-                    m_velocity.Y = (BONESPEED * level.multiplier) * 0.6f;
-                    if (m_collisionCheck)
+                    velocity.X = 0;
+                    velocity.Y = (BONESPEED * level.multiplier) * 0.6f;
+                    if (collisionCheck)
                     {
                         animState = State.None;
                     }
-                    m_source.Width = 50;
-                    m_source.Height = 33;
-                    if (m_source.X % 50 != 0)
+                    source.Width = 50;
+                    source.Height = 33;
+                    if (source.X % 50 != 0)
                     {
-                        m_source.X = 0;
+                        source.X = 0;
                     }
-                    groundCollision.X = (int)m_position.X - 7;
-                    groundCollision.Y = (int)m_position.Y - 7;
-                    playerCollision = new Rectangle((int)m_position.X - 20, (int)m_position.Y - 7, 40, 15);
-                    scoreRectangle = new Rectangle((int)m_position.X - 2, (int)m_position.Y - 27, 4, 20);
+                    groundCollision.X = (int)position.X - 7;
+                    groundCollision.Y = (int)position.Y - 7;
+                    playerCollision = new Rectangle((int)position.X - 20, (int)position.Y - 7, 40, 15);
+                    scoreRectangle = new Rectangle((int)position.X - 2, (int)position.Y - 27, 4, 20);
                     break;
             }
         }
@@ -244,15 +244,15 @@ namespace Bone_King
             //Chooses which spritesheet to use, and whether to flip it
             if (animState == State.FallingLeft || animState == State.RollingLeft)
             {
-                sb.Draw(m_normalSprites, new Vector2((int)m_position.X, (int)m_position.Y), m_source, Color.White, 0, new Vector2(m_source.Width / 2, m_source.Height / 2), 1, SpriteEffects.FlipHorizontally, 0.9f);
+                sb.Draw(normalSprites, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(source.Width / 2, source.Height / 2), 1, SpriteEffects.FlipHorizontally, 0.9f);
             }
             else if (animState == State.FallingRight || animState == State.RollingRight)
             {
-                sb.Draw(m_normalSprites, new Vector2((int)m_position.X, (int)m_position.Y), m_source, Color.White, 0, new Vector2(m_source.Width / 2, m_source.Height / 2), 1, SpriteEffects.None, 0.9f);
+                sb.Draw(normalSprites, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(source.Width / 2, source.Height / 2), 1, SpriteEffects.None, 0.9f);
             }
             else if (animState == State.Ladder)
             {
-                sb.Draw(m_ladderSprites, new Vector2((int)m_position.X, (int)m_position.Y), m_source, Color.White, 0, new Vector2(m_source.Width / 2, m_source.Height / 2), 1, SpriteEffects.None, 0.9f);
+                sb.Draw(ladderSprites, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(source.Width / 2, source.Height / 2), 1, SpriteEffects.None, 0.9f);
             }
         }
 #if DEBUG

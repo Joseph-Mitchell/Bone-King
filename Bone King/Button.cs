@@ -5,16 +5,16 @@ namespace Bone_King
 {
     class Button
     {
-        Texture2D m_texture;
-        Vector2 m_position;
+        Texture2D texture;
+        Vector2 position;
         public Color color;
 
         public bool hovered;
 
         public Button(Texture2D texture, int x, int y)
         {
-            m_texture = texture;
-            m_position = new Vector2(x, y);
+            this.texture = texture;
+            position = new Vector2(x, y);
             color = Color.Gray;
         }
 
@@ -22,11 +22,11 @@ namespace Bone_King
         {
             if (hovered)
             {
-                sb.Draw(m_texture, m_position, null, Color.White, 0, new Vector2(m_texture.Bounds.Center.X, m_texture.Bounds.Center.Y), 1, SpriteEffects.None, 1);
+                sb.Draw(texture, position, null, Color.White, 0, new Vector2(texture.Bounds.Center.X, texture.Bounds.Center.Y), 1, SpriteEffects.None, 1);
             }
             else
             {
-                sb.Draw(m_texture, m_position, null, color, 0, new Vector2(m_texture.Bounds.Center.X, m_texture.Bounds.Center.Y), 1, SpriteEffects.None, 1);
+                sb.Draw(texture, position, null, color, 0, new Vector2(texture.Bounds.Center.X, texture.Bounds.Center.Y), 1, SpriteEffects.None, 1);
             }
         }
     }

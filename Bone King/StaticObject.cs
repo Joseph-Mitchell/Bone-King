@@ -5,20 +5,20 @@ namespace Bone_King
 {
     class StaticObject
     {
-        Texture2D m_texture;
-        public Vector2 m_position;
+        Texture2D texture;
+        public Vector2 position;
 
-        float m_layer;
+        float layer;
         public StaticObject(Texture2D texture, int x, int y, float layer)
         {
-            m_texture = texture;
-            m_position = new Vector2(x, y);
-            m_layer = layer;
+            this.texture = texture;
+            position = new Vector2(x, y);
+            this.layer = layer;
         }
 
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(m_texture, m_position, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, m_layer);
+            sb.Draw(texture, position, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, layer);
         }
     }
 }

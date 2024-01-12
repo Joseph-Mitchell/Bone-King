@@ -6,13 +6,13 @@ namespace Bone_King
     class SpecialBone
     {
 
-        Texture2D m_spriteSheet;
-        Vector2 m_position, m_velocity;
-        Rectangle m_source;
+        Texture2D spriteSheet;
+        Vector2 position, velocity;
+        Rectangle source;
         public Rectangle collision;
 
-        int m_frameTimer;
-        bool m_collisionCheck, m_collisionCheckOld;
+        int frameTimer;
+        bool collisionCheck, collisionCheckOld;
         public bool isActive;
 
         const int ANIMATIONSPEED = 4;
@@ -20,27 +20,27 @@ namespace Bone_King
 
         public SpecialBone(Texture2D spritesheet, int x, int y)
         {
-            m_spriteSheet = spritesheet;
-            m_position = new Vector2(x, y);
-            m_velocity = Vector2.Zero;
+            spriteSheet = spritesheet;
+            position = new Vector2(x, y);
+            velocity = Vector2.Zero;
 
-            m_source = new Rectangle(0, 0, 50, 33);
+            source = new Rectangle(0, 0, 50, 33);
 
             collision = new Rectangle(x + 4, y + 9, 42, 15);
 
-            m_frameTimer = ANIMATIONSPEED;
+            frameTimer = ANIMATIONSPEED;
             isActive = true;
         }
 
         public void Update(GameTime gt, Background background, Game1 game)
         {
-            m_position += m_velocity;
-            m_collisionCheck = false;
+            position += velocity;
+            collisionCheck = false;
 
             //Gravity
-            if (m_velocity.Y < GRAVITY * 30)
+            if (velocity.Y < GRAVITY * 30)
             {
-                m_velocity.Y += GRAVITY;
+                velocity.Y += GRAVITY;
             }
 
             //Checks if the bone hits a platform
@@ -48,40 +48,40 @@ namespace Bone_King
             {
                 if (collision.Intersects(background.platformHitBoxes[i]))
                 {
-                    m_collisionCheck = true;
+                    collisionCheck = true;
                 }
             }
 
             //Slows down the bone every time it hits a platform
-            if (m_collisionCheck && m_collisionCheckOld == false)
+            if (collisionCheck && collisionCheckOld == false)
             {
-                m_velocity.Y = 0;
+                velocity.Y = 0;
                 game.bang.Play();
             }
 
             //Makes collision rectangles follow the main sprite position
-            collision = new Rectangle((int)m_position.X + 4, (int)m_position.Y + 9, 42, 15);
+            collision = new Rectangle((int)position.X + 4, (int)position.Y + 9, 42, 15);
 
-            m_collisionCheckOld = m_collisionCheck;
+            collisionCheckOld = collisionCheck;
 
-            if (m_frameTimer <= 0)
+            if (frameTimer <= 0)
             {
-                m_source.X = (m_source.X + m_source.Width);
-                if (m_source.X >= m_spriteSheet.Width)
+                source.X = (source.X + source.Width);
+                if (source.X >= spriteSheet.Width)
                 {
-                    m_source.X = 0;
+                    source.X = 0;
                 }
-                m_frameTimer = ANIMATIONSPEED;
+                frameTimer = ANIMATIONSPEED;
             }
             else
             {
-                m_frameTimer -= 1;
+                frameTimer -= 1;
             }
         }
 
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(m_spriteSheet, new Vector2((int)m_position.X, (int)m_position.Y), m_source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.91f);
+            sb.Draw(spriteSheet, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.91f);
         }
 
 #if DEBUG

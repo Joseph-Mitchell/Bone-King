@@ -6,14 +6,14 @@ namespace Bone_King
     //This object is the background and collisions of the level itself
     class Background
     {
-        Texture2D m_texture;
+        Texture2D texture;
         public Rectangle[] platformHitBoxes, ladderHitBoxes, ladderTops;
         public Rectangle goal;
         public bool[] brokenLadder;
 
         public Background(Texture2D texture)
         {
-            m_texture = texture;
+            this.texture = texture;
 
             platformHitBoxes = new Rectangle[49];
             ladderHitBoxes = new Rectangle[13];
@@ -132,7 +132,7 @@ namespace Bone_King
 
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(m_texture, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            sb.Draw(texture, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
         }
 #if DEBUG
         public void DebugDraw(SpriteBatch sb, Texture2D hitBoxTexture)

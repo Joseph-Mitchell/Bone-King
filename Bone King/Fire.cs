@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace Bone_King
 {
@@ -8,21 +8,21 @@ namespace Bone_King
     {
         public Rectangle collision;
 
-        int m_spawnTimer;
-        bool m_readyToSpawn;
+        int spawnTimer;
+        bool readyToSpawn;
         public bool spawning;
 
         const int SPAWNTIME = 120;
         public Fire (Texture2D spriteSheet, int x, int y, int width, int height, int animationSpeed, float layer):base(spriteSheet, x, y, width, height, animationSpeed, layer)
         {
             collision = new Rectangle(x, y, width, height);
-            m_spawnTimer = SPAWNTIME;
+            spawnTimer = SPAWNTIME;
         }
 
         public void Reset()
         {
-            m_spawnTimer = SPAWNTIME;
-            m_readyToSpawn = false;
+            spawnTimer = SPAWNTIME;
+            readyToSpawn = false;
             spawning = false;
         }
 
@@ -32,22 +32,22 @@ namespace Bone_King
             {
                 if (collision.Intersects(specialBones[i].collision) && specialBones[i].collision.Y > collision.Y)
                 {
-                    m_readyToSpawn = true;
+                    readyToSpawn = true;
                     specialBones.RemoveAt(i);
                 }
             }
 
-            if (m_readyToSpawn)
+            if (readyToSpawn)
             {
-                if (m_spawnTimer <= 0)
+                if (spawnTimer <= 0)
                 {
-                    m_spawnTimer = SPAWNTIME;
-                    m_readyToSpawn = false;
+                    spawnTimer = SPAWNTIME;
+                    readyToSpawn = false;
                     spawning = true;
                 }
                 else
                 {
-                    m_spawnTimer -= 1;
+                    spawnTimer -= 1;
                 }
             }
         }
