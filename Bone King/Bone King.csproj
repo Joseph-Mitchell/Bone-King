@@ -70,22 +70,17 @@
   <ItemGroup>
     <Compile Include="AnimatedSprite.cs" />
     <Compile Include="Axe.cs" />
+    <Compile Include="ButtonManager.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Barry.cs" />
     <Compile Include="BoneKing.cs" />
     <Compile Include="Bone.cs" />
     <Compile Include="Button.cs" />
-    <Compile Include="ExitButton.cs" />
     <Compile Include="Fire.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="GameValues.cs" />
-    <Compile Include="InstructionsButton.cs" />
-    <Compile Include="LeftArrow.cs" />
-    <Compile Include="MenuButton.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleBurst.cs" />
-    <Compile Include="PlayButton.cs" />
-    <Compile Include="RightArrow.cs" />
     <Compile Include="Scores.cs" />
     <Compile Include="Skull.cs" />
     <Compile Include="SpecialBone.cs" />

@@ -27,7 +27,7 @@ namespace Bone_King
         public Rectangle collision, axeCollision;
 
         int frameTimer, frame, deathTimer, deathStage, axeSwingTimer, axeTotalTimer, climbedLadder;
-        bool feetCollisionCheck, facingRight, ladderIntersect, atLadderTop;
+        bool feetCollisionCheck, facingRight;
         public bool reset, holdingAxe, axeDown;
 
         const int ANIMATIONSPEED = 3, LADDERANIMATIONSPEED = 8, DEATHANIMATIONSPEED = 8, AXESPEED = 15, AXETIME = 400;

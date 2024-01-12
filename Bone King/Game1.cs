@@ -38,13 +38,10 @@ namespace Bone_King
         StaticObject menuBackground, pauseScreen, gameOver, finalScore, bonePile;
         StaticObject[] pages;
         List<Scores> scores;
-        PlayButton button1;
-        InstructionsButton button2;
-        ExitButton button3;
-        MenuButton button4;
-        LeftArrow button5;
-        RightArrow button6;
-        Level background;
+        ButtonManager buttonManager;
+        Button[] menuButtons = new Button[3];
+        Button[] instructionButtons = new Button[3];
+        Level level;
         List<Bone> bones;
         List<SpecialBone> specialBones;
         List<Skull> skulls;
@@ -61,6 +58,7 @@ namespace Bone_King
         bool debugShow, currentScoreCollision, oldScoreCollision, introPlayed, cutscene2Played, finalScoreReady, highScore, drumPlayed;
         public bool paused;
         public float timer, finalScoreTimer, highScoreBlinkTimer;
+        int currentButton;
         public int lives, instructionPage;
 
         const int HIGHSCOREBLINKTIME = 51;
@@ -87,6 +85,8 @@ namespace Bone_King
             skulls = new List<Skull>();
             axes = new Axe[4];
             scores = new List<Scores>();
+
+            buttonManager = ButtonManager.Instance(this);
 
             currentInput = new Input();
             oldInput = new Input();
@@ -119,22 +119,16 @@ namespace Bone_King
             {
                 pages[i] = new StaticObject(Content.Load<Texture2D>("Textures\\page-" + i), 0, 0, 0.1f);
             }
-            button1 = new PlayButton(Content.Load<Texture2D>("Textures\\playbutton"), graphics.PreferredBackBufferWidth / 2, 180)
+            menuButtons[0] = new Button(Content.Load<Texture2D>("Textures\\playbutton"), graphics.PreferredBackBufferWidth / 2, 180, ButtonEffect.Play)
             {
                 hovered = true
             };
-            button2 = new InstructionsButton(Content.Load<Texture2D>("Textures\\instructionsbutton"), graphics.PreferredBackBufferWidth / 2, 260);
-            button3 = new ExitButton(Content.Load<Texture2D>("Textures\\exitbutton"), graphics.PreferredBackBufferWidth / 2, 340);
-            button4 = new MenuButton(Content.Load<Texture2D>("Textures\\menubutton"), graphics.PreferredBackBufferWidth / 2, 17)
-            {
-                hovered = true
-            };
-            button5 = new LeftArrow(Content.Load<Texture2D>("Textures\\arrowflipped"), 18, 18)
-            {
-                color = Color.TransparentBlack
-            };
-            button6 = new RightArrow(Content.Load<Texture2D>("Textures\\arrow"), graphics.PreferredBackBufferWidth - 18, 18);
-            background = new Level(Content.Load<Texture2D>("Textures\\background"));
+            menuButtons[1] = new Button(Content.Load<Texture2D>("Textures\\instructionsbutton"), graphics.PreferredBackBufferWidth / 2, 260, ButtonEffect.Instructions);
+            menuButtons[2] = new Button(Content.Load<Texture2D>("Textures\\exitbutton"), graphics.PreferredBackBufferWidth / 2, 340, ButtonEffect.Exit);
+            instructionButtons[0] = new Button(Content.Load<Texture2D>("Textures\\arrowflipped"), 18, 18, ButtonEffect.Left);
+            instructionButtons[1] = new Button(Content.Load<Texture2D>("Textures\\menubutton"), graphics.PreferredBackBufferWidth / 2, 17, ButtonEffect.Menu);
+            instructionButtons[2] = new Button(Content.Load<Texture2D>("Textures\\arrow"), graphics.PreferredBackBufferWidth - 18, 18, ButtonEffect.Right);
+            level = new Level(Content.Load<Texture2D>("Textures\\background"));
             player = new Barry(Content.Load<Texture2D>("Textures\\barryRun"),
                 Content.Load<Texture2D>("Textures\\barryRunWithAxe"),
                 Content.Load<Texture2D>("Textures\\barryJump"),
@@ -224,7 +218,7 @@ namespace Bone_King
             skulls.RemoveAll(s => s.active == false);
             scores.RemoveAll(s => s.active == false);
 
-            if (player.collision.Intersects(background.goal))
+            if (player.collision.Intersects(level.goal))
             {
                 gameState = GameState.Cutscene2;
             }
@@ -288,12 +282,56 @@ namespace Bone_King
             gameState = GameState.GameOver;
         }
 
+        public void GoToInstructions()
+        {
+            currentButton = 1;
+            instructionButtons[0].hovered = false;
+            instructionButtons[0].active = false;
+            instructionButtons[1].hovered = true;
+            instructionButtons[2].hovered = false;
+            gameState = GameState.Instructions;
+        }
+
+        public void InstructionsChangePage(int change)
+        {
+            instructionPage += change;
+            if (instructionPage == 4)
+            {
+                instructionButtons[2].active = false;
+                instructionButtons[2].hovered = false;
+                instructionButtons[1].hovered = true;
+                currentButton = 1;
+            }
+            else
+                instructionButtons[2].active = true;
+
+            if (instructionPage == 0)
+            {
+                instructionButtons[0].active = false;
+                instructionButtons[0].hovered = false;
+                instructionButtons[1].hovered = true;
+                currentButton = 1;
+            }
+            else
+                instructionButtons[0].active = true;
+        }
+
+        public void GoToMenu()
+        {
+            currentButton = 0;
+            menuButtons[0].hovered = true;
+            menuButtons[1].hovered = false;
+            menuButtons[2].hovered = false;
+            gameState = GameState.Menu;
+        }
+
         protected override void Update(GameTime gameTime)
         {
             currentInput.Update();
             switch (gameState)
             {
                 case GameState.Menu:
+
                     //Plays the menu song
                     if (menuSongInstance == null)
                     {
@@ -307,140 +345,72 @@ namespace Bone_King
                         menuSongInstance.Play();
                     }
 
-                    //Handles button movement and selection
-                    if(button1.hovered)
+                    //Handle Buttons
+                    if (currentInput.up && !oldInput.up)
                     {
-                        if (currentInput.up && oldInput.up == false)
+                        int newButton = currentButton - 1;
+                        if (newButton < 0)
+                            newButton = 2;
+                        if (menuButtons[newButton].active)
                         {
-                            button1.hovered = false;
-                            button3.hovered = true;
-                        }
-                        if (currentInput.down && oldInput.down == false)
-                        {
-                            button1.hovered = false;
-                            button2.hovered = true;
-                        }
-                        if (currentInput.action && !oldInput.action)
-                        {
-                            button1.Pressed(this);
-                            menuSongInstance.Stop();
+                            menuButtons[currentButton].hovered = false;
+                            menuButtons[newButton].hovered = true;
+                            currentButton = newButton;
                         }
                     }
-                    else if (button2.hovered)
+                    if (currentInput.down && !oldInput.down)
                     {
-                        if (currentInput.up && oldInput.up == false)
+                        int newButton = currentButton + 1;
+                        if (newButton > 2)
+                            newButton = 0;
+                        if (menuButtons[newButton].active)
                         {
-                            button2.hovered = false;
-                            button1.hovered = true;
-                        }
-                        if (currentInput.down && oldInput.down == false)
-                        {
-                            button2.hovered = false;
-                            button3.hovered = true;
-                        }
-                        if (currentInput.action && oldInput.action == false)
-                        {
-                            button2.Pressed(this);
+                            menuButtons[currentButton].hovered = false;
+                            menuButtons[newButton].hovered = true;
+                            currentButton = newButton;
                         }
                     }
-                    else if (button3.hovered)
+                    if (currentInput.action && !oldInput.action)
                     {
-                        if (currentInput.up && oldInput.up == false)
-                        {
-                            button3.hovered = false;
-                            button2.hovered = true;
-                        }
-                        if (currentInput.down && oldInput.down == false)
-                        {
-                            button3.hovered = false;
-                            button1.hovered = true;
-                        }
-                        if (currentInput.action)
-                        {
-                            button3.Pressed(this);
-                        }
+                        buttonManager.PressButton(menuButtons[currentButton].effect);
                     }
                     break;
                 case GameState.Instructions:
-                    //Handles button movement and selection
-                    if (button4.hovered)
+
+                    //Handle buttons
+                    if (currentInput.left && !oldInput.left)
                     {
-                        if (currentInput.left && oldInput.left == false && instructionPage > 0)
+                        int newButton = currentButton - 1;
+                        if (newButton < 0)
+                            newButton = 2;
+                        if (instructionButtons[newButton].active)
                         {
-                            button4.hovered = false;
-                            button5.hovered = true;
-                        }
-                        if (currentInput.right && oldInput.right == false && instructionPage < 5)
-                        {
-                            button4.hovered = false;
-                            button6.hovered = true;
-                        }
-                        if (currentInput.action && oldInput.action == false)
-                        {
-                            button4.Pressed(this);
-                            instructionPage = 0;
+                            instructionButtons[currentButton].hovered = false;
+                            instructionButtons[newButton].hovered = true;
+                            currentButton = newButton;
                         }
                     }
-                    if (button5.hovered)
+                    if (currentInput.right && !oldInput.right)
                     {
-                        if (instructionPage == 0)
+                        int newButton = currentButton + 1;
+                        if (newButton > 2)
+                            newButton = 0;
+                        if (instructionButtons[newButton].active)
                         {
-                            button5.hovered = false;
-                            button5.color = Color.TransparentBlack;
-                            button4.hovered = true;
-                        }
-                        else
-                        {
-                            button5.color = Color.Gray;
-                        }
-                        if (currentInput.right && oldInput.right == false)
-                        {
-                            button5.hovered = false;
-                            button4.hovered = true;
-                        }
-                        if (currentInput.action && oldInput.action == false)
-                        {
-                            button5.Pressed(this);
+                            instructionButtons[currentButton].hovered = false;
+                            instructionButtons[newButton].hovered = true;
+                            currentButton = newButton;
                         }
                     }
-                    if (button6.hovered)
+                    if (currentInput.action && !oldInput.action)
                     {
-                        if (instructionPage == 4)
-                        {
-                            button6.hovered = false;
-                            button4.hovered = true;
-                        }
-                        if (currentInput.left && oldInput.left == false)
-                        {
-                            button6.hovered = false;
-                            button4.hovered = true;
-                        }
-                        if (currentInput.action && oldInput.action == false)
-                        {
-                            button6.Pressed(this);
-                        }
+                        buttonManager.PressButton(instructionButtons[currentButton].effect);
                     }
 
-                    //Makes the arrow buttons unable to be selected at the first and last page
-                    if (instructionPage == 4)
-                    {
-                        button6.color = Color.TransparentBlack;
-                    }
-                    else
-                    {
-                        button6.color = Color.Gray;
-                    }
-                    if (instructionPage == 0)
-                    {
-                        button5.color = Color.TransparentBlack;
-                    }
-                    else
-                    {
-                        button5.color = Color.Gray;
-                    }
                     break;
                 //Cutscene which plays when starting a game
                 case GameState.Cutscene1:
+                    menuSongInstance.Stop();
                     if (introPlayer.State == MediaState.Stopped)
                     {
                         if (!introPlayed)
@@ -567,7 +537,7 @@ namespace Bone_King
                             #region Bone Updates
                             for (int i = 0; i < bones.Count; i++)
                             {
-                                bones[i].Update(gameTime, background, RNG, gameValues);
+                                bones[i].Update(level, RNG, gameValues);
                                 //Deactivates bone if collides with axe 
                                 if (bones[i].playerCollision.Intersects(player.axeCollision) && player.holdingAxe)
                                 {
@@ -599,7 +569,7 @@ namespace Bone_King
                             #region SpecialBone Updates
                             for (int i = 0; i < specialBones.Count; i++)
                             {
-                                specialBones[i].Update(gameTime, background, this);
+                                specialBones[i].Update(gameTime, level, this);
 
                                 //Kill player if collision intersects player
                                 if (specialBones[i].collision.Intersects(player.collision))
@@ -618,7 +588,7 @@ namespace Bone_King
                             #region Skull
                             for (int i = 0; i < skulls.Count; i++)
                             {
-                                skulls[i].Update(background, RNG, graphics.PreferredBackBufferWidth, player);
+                                skulls[i].Update(level, RNG, graphics.PreferredBackBufferWidth, player);
 
                                 //Kill player if collision intersects player
                                 if (skulls[i].collision.Intersects(player.collision))
@@ -697,7 +667,7 @@ namespace Bone_King
                             }
                             scores.RemoveAll(s => s.active == false);
 
-                            player.Update(currentInput, oldInput, background, gameValues, graphics.PreferredBackBufferWidth, this);
+                            player.Update(currentInput, oldInput, level, gameValues, graphics.PreferredBackBufferWidth, this);
 
                             beatrice.UpdateAnimation();
 
@@ -876,17 +846,15 @@ namespace Bone_King
             {
                 case GameState.Menu:
                     menuBackground.Draw(spriteBatch);
-                    button1.Draw(spriteBatch);
-                    button2.Draw(spriteBatch);
-                    button3.Draw(spriteBatch);
+                    for (int i = 0; i < menuButtons.Length; i++)
+                        menuButtons[i].Draw(spriteBatch);
                     spriteBatch.DrawString(mainFont, "HIGHSCORE", new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight - 20), Color.White, 0, new Vector2(mainFont.MeasureString("HIGHSCORE").X / 2, mainFont.MeasureString("HIGHSCORE").Y), 1, SpriteEffects.None, 1);
                     spriteBatch.DrawString(mainFont, gameValues.highScore.ToString(), new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight), Color.White, 0, new Vector2(mainFont.MeasureString(gameValues.highScore.ToString()).X / 2, mainFont.MeasureString(gameValues.highScore.ToString()).Y), 1, SpriteEffects.None, 1);
                     break;
                 case GameState.Instructions:
                     pages[instructionPage].Draw(spriteBatch);
-                    button4.Draw(spriteBatch);
-                    button5.Draw(spriteBatch);
-                    button6.Draw(spriteBatch);
+                    for (int i = 0; i < menuButtons.Length; i++)
+                        instructionButtons[i].Draw(spriteBatch);
                     break;
                 case GameState.Cutscene1:
                     Texture2D introTexture = null;
@@ -904,7 +872,7 @@ namespace Bone_King
                     break;
                 case GameState.Playing:
                     #region New Classes
-                    background.Draw(spriteBatch);
+                    level.Draw(spriteBatch);
                     bonePile.Draw(spriteBatch);
                     player.Draw(spriteBatch, this);
                     boney.Draw(spriteBatch);
@@ -1009,7 +977,7 @@ namespace Bone_King
 #if DEBUG
             if (debugShow)
             {
-                background.DebugDraw(spriteBatch, hitBoxTexture);
+                level.DebugDraw(spriteBatch, hitBoxTexture);
                 for (int i = 0; i < bones.Count; i++)
                 {
                     bones[i].DebugDraw(spriteBatch, hitBoxTexture, debugFont);
