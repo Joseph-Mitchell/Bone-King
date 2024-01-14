@@ -430,6 +430,8 @@ namespace Bone_King
                         introInstance.Volume = 0.5f;
                         introInstance.Play();
                     }
+                    if (currentInput.pause && introPlayed)
+                        introPlayer.Stop();
                     break;
                 case GameState.Playing:
                     //Plays in-game song
