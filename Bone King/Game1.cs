@@ -431,7 +431,10 @@ namespace Bone_King
                         introInstance.Play();
                     }
                     if (currentInput.pause && introPlayed)
+                    {
                         introPlayer.Stop();
+                        introInstance.Stop();
+                    }
                     break;
                 case GameState.Playing:
                     //Plays in-game song
