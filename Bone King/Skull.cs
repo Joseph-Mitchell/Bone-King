@@ -41,7 +41,7 @@ namespace Bone_King
             active = true;
         }
 
-        public void Update(Level background, Random RNG, int maxX, Barry player)
+        public void Update(Level background, Random RNG, int maxX, Player player)
         {
             //Gravity
             if (velocity.Y < GRAVITY * 30 && state != State.Ladder)

@@ -46,7 +46,7 @@ namespace Bone_King
         List<SpecialBone> specialBones;
         List<Skull> skulls;
         Axe[] axes;
-        Barry player;
+        Player player;
         BoneKing boney;
         AnimatedSprite beatrice;
         Fire fire;
@@ -129,7 +129,7 @@ namespace Bone_King
             instructionButtons[1] = new Button(Content.Load<Texture2D>("Textures\\menubutton"), graphics.PreferredBackBufferWidth / 2, 17, ButtonEffect.Menu);
             instructionButtons[2] = new Button(Content.Load<Texture2D>("Textures\\arrow"), graphics.PreferredBackBufferWidth - 18, 18, ButtonEffect.Right);
             level = new Level(Content.Load<Texture2D>("Textures\\background"));
-            player = new Barry(Content.Load<Texture2D>("Textures\\barryRun"),
+            player = new Player(Content.Load<Texture2D>("Textures\\barryRun"),
                 Content.Load<Texture2D>("Textures\\barryRunWithAxe"),
                 Content.Load<Texture2D>("Textures\\barryJump"),
                 Content.Load<Texture2D>("Textures\\barryClimb"),
@@ -148,7 +148,7 @@ namespace Bone_King
             axes[2] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 24, 190);
             axes[3] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 470, 130);
             int potato = RNG.Next(0, 4);
-            axes[potato].activc = true;
+            axes[potato].active = true;
             #endregion
 
             //Textures
@@ -205,7 +205,7 @@ namespace Bone_King
             }
             for (int i = 0; i < axes.Length; i++)
             {
-                axes[i].activc = false;
+                axes[i].active = false;
             }
             for (int i = 0; i < scores.Count; i++)
             {
@@ -229,7 +229,7 @@ namespace Bone_King
             timer = gameValues.initialTime;
 
             int potato = RNG.Next(0, 4);
-            axes[potato].activc = true;
+            axes[potato].active = true;
         }
 
         //Called when player dies and has no remaining lives
@@ -250,7 +250,7 @@ namespace Bone_King
             }
             for (int i = 0; i < axes.Length; i++)
             {
-                axes[i].activc = false;
+                axes[i].active = false;
             }
             for (int i = 0; i < scores.Count; i++)
             {
@@ -270,7 +270,7 @@ namespace Bone_King
             timer = gameValues.initialTime;
 
             int potato = RNG.Next(0, 4);
-            axes[potato].activc = true;
+            axes[potato].active = true;
 
             debugShow = false;
             currentScoreCollision = false;
@@ -534,7 +534,7 @@ namespace Bone_King
 
                     if (paused == false)
                     {
-                        if (player.state != Barry.State.Death)
+                        if (player.state != Player.State.Death)
                         {
                             #region New Class Updates
                             currentScoreCollision = false; //Resets the flag which tells the game to increase score when a bone is jumped over
@@ -560,11 +560,11 @@ namespace Bone_King
                                         axeLoopInstance.Stop();
                                     }
 
-                                    player.state = Barry.State.Death;
+                                    player.state = Player.State.Death;
                                     lives -= 1;
                                 }
                                 //Set a flag to true if player jumps over a bone
-                                if (bones[i].scoreCollision.Intersects(player.collision) && (player.state == Barry.State.JumpingLeft || player.state == Barry.State.JumpingRight) && bones[i].state != Bone.State.Ladder)
+                                if (bones[i].scoreCollision.Intersects(player.collision) && (player.state == Player.State.JumpingLeft || player.state == Player.State.JumpingRight) && bones[i].state != Bone.State.Ladder)
                                 {
                                     currentScoreCollision = true;
                                 }
@@ -584,7 +584,7 @@ namespace Bone_King
                                     {
                                         axeLoopInstance.Stop();
                                     }
-                                    player.state = Barry.State.Death;
+                                    player.state = Player.State.Death;
                                     lives -= 1;
                                 }
                             }
@@ -603,7 +603,7 @@ namespace Bone_King
                                     {
                                         axeLoopInstance.Stop();
                                     }
-                                    player.state = Barry.State.Death;
+                                    player.state = Player.State.Death;
                                     lives -= 1;
                                 }
                                 //Deactivates skull if collides with axe 
@@ -633,9 +633,9 @@ namespace Bone_King
                             for (int i = 0; i < axes.Length; i++)
                             {
                                 //Removes axe item if collided with
-                                if (axes[i].collision.Intersects(player.collision) && axes[i].activc)
+                                if (axes[i].collision.Intersects(player.collision) && axes[i].active)
                                 {
-                                    axes[i].activc = false;
+                                    axes[i].active = false;
                                     player.holdingAxe = true;
                                     playLoopInstance.Stop();
 
@@ -659,7 +659,7 @@ namespace Bone_King
                                 playLoopInstance = null;
                             }
                             //Play death music if player dead
-                            if (player.state != Barry.State.Death && deathSongInstance != null)
+                            if (player.state != Player.State.Death && deathSongInstance != null)
                             {
                                 deathSongInstance = null;
                                 playLoopInstance = null;
@@ -705,7 +705,7 @@ namespace Bone_King
                                 {
                                     axeLoopInstance.Stop();
                                 }
-                                player.state = Barry.State.Death;
+                                player.state = Player.State.Death;
                             }
                             #endregion
 
@@ -720,7 +720,7 @@ namespace Bone_King
                                 {
                                     axeLoopInstance.Stop();
                                 }
-                                player.state = Barry.State.Death;
+                                player.state = Player.State.Death;
                             }
                             else
                             {

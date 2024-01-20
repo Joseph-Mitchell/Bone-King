@@ -9,7 +9,7 @@ namespace Bone_King
         Vector2 position;
         public Rectangle collision;
 
-        public bool activc;
+        public bool active;
 
         public Axe (Texture2D texture, int x, int y)
         {
@@ -20,7 +20,7 @@ namespace Bone_King
 
         public void Draw(SpriteBatch sb)
         {
-            if (activc)
+            if (active)
             {
                 sb.Draw(texture, position, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.8f);
             }
@@ -28,7 +28,7 @@ namespace Bone_King
 #if DEBUG
         public void DebugDraw(SpriteBatch sb, Texture2D texture)
         {
-            if (activc)
+            if (active)
             {
                 sb.Draw(texture, collision, null, Color.Yellow, 0, Vector2.Zero, SpriteEffects.None, 1);
             }
