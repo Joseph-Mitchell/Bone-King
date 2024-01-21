@@ -108,7 +108,7 @@ namespace Bone_King
             ladders[9] = new Ladder(94, 182, 164, 43);
             ladders[10] = new Ladder(228, 148, 96, 25);
             ladders[11] = new Ladder(382, 120, 102, 47);
-            ladders[12] = new Ladder(288, 66, 84, 47);
+            ladders[12] = new Ladder(288, 66, 48, 47);
 
             for (int i = 0; i < ladders.Length; i++)
             {

@@ -85,6 +85,10 @@ namespace Bone_King
             skulls = new List<Skull>();
             axes = new Axe[4];
             scores = new List<Scores>();
+            beatrice = new AnimatedSprite(169, 35, 30, 44, 30, 1);
+            fire = new Fire(78, 379, 30, 36, 15, 0.8f);
+
+            player = new Player(80, 380);
 
             buttonManager = ButtonManager.Instance(this);
 
@@ -129,20 +133,14 @@ namespace Bone_King
             instructionButtons[1] = new Button(Content.Load<Texture2D>("Textures\\menubutton"), graphics.PreferredBackBufferWidth / 2, 17, ButtonEffect.Menu);
             instructionButtons[2] = new Button(Content.Load<Texture2D>("Textures\\arrow"), graphics.PreferredBackBufferWidth - 18, 18, ButtonEffect.Right);
             level = new Level(Content.Load<Texture2D>("Textures\\background"));
-            player = new Player(Content.Load<Texture2D>("Textures\\barryRun"),
-                Content.Load<Texture2D>("Textures\\barryRunWithAxe"),
-                Content.Load<Texture2D>("Textures\\barryJump"),
-                Content.Load<Texture2D>("Textures\\barryClimb"),
-                Content.Load<Texture2D>("Textures\\barryClimbOver"),
-                Content.Load<Texture2D>("Textures\\barryDeath"), 
-                80, 380);
+            player.Load(Content);
             boney = new BoneKing(Content.Load<Texture2D>("Textures\\standingBoneKing"),
                 Content.Load<Texture2D>("Textures\\throwingBoneKing"),
                 Content.Load<Texture2D>("Textures\\angeryBoneKing"),
                 Content.Load<Texture2D>("Textures\\specialBoneKing"),
                 42, 41);
-            beatrice = new AnimatedSprite(Content.Load<Texture2D>("Textures\\beatrice"), 169, 35, 30, 44, 30, 1);
-            fire = new Fire(Content.Load<Texture2D>("Textures\\fire"), 78, 379, 30, 36, 15, 0.8f);
+            beatrice.Load(new List<Texture2D>() {Content.Load<Texture2D>("Textures\\beatrice")});            
+            fire.Load(new List<Texture2D>() { Content.Load<Texture2D>("Textures\\fire") });
             axes[0] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 24, 310);
             axes[1] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 470, 250);
             axes[2] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 24, 190);
@@ -674,11 +672,8 @@ namespace Bone_King
 
                             player.Update(currentInput, oldInput, level, gameValues, graphics.PreferredBackBufferWidth, this);
 
-                            beatrice.UpdateAnimation();
-
                             //Fire Updates
                             fire.Update(specialBones);
-                            fire.UpdateAnimation();
                             if (fire.spawning)
                             {
                                 skulls.Add(new Skull(Content.Load<Texture2D>("Textures\\skull"), 78, 379));
@@ -708,8 +703,6 @@ namespace Bone_King
                                 player.state = Player.State.Death;
                             }
                             #endregion
-
-
                             #endregion
 
                             //Resets Barry if the time runs out

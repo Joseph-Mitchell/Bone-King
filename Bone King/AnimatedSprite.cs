@@ -1,20 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace Bone_King
 {
     class AnimatedSprite
     {
-        Texture2D spriteSheet;
+        List<Texture2D> spriteSheets;
         Vector2 position;
         Rectangle source;
 
-        int frameTimer, animationSpeed;
+        int frameTimer, animationSpeed, currentSpriteSheet;
         float layer;
 
-        public AnimatedSprite (Texture2D spriteSheet, int x, int y, int width, int height, int animationSpeed, float layer)
+        public AnimatedSprite (int x, int y, int width, int height, int animationSpeed, float layer)
         {
-            this.spriteSheet = spriteSheet;
             position = new Vector2(x, y);
             source = new Rectangle(0, 0, width, height);
 
@@ -23,26 +23,27 @@ namespace Bone_King
             this.layer = layer;
         }
 
-        public void UpdateAnimation()
+        public void Load (List<Texture2D> spriteSheets)
         {
-            if (frameTimer <= 0)
-            {
-                source.X += source.Width;
-                if (source.X >= spriteSheet.Width)
-                {
-                    source.X = 0;
-                }
-                frameTimer = animationSpeed;
-            }
-            else
-            {
-                frameTimer -= 1;
-            }
+            this.spriteSheets = spriteSheets;
         }
 
         public void Draw (SpriteBatch sb)
         {
-            sb.Draw(spriteSheet, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, layer);
+            if (frameTimer > 0)
+            {
+                frameTimer -= 1;
+            }
+            else
+            {
+                source.X += source.Width;
+                if (source.X >= spriteSheets[currentSpriteSheet].Width)
+                    source.X = 0;
+
+                frameTimer = animationSpeed;
+            }
+
+            sb.Draw(spriteSheets[currentSpriteSheet], new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, layer);
         }
     }
 }

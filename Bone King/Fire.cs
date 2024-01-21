@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace Bone_King
@@ -13,7 +12,7 @@ namespace Bone_King
         public bool spawning;
 
         const int SPAWNTIME = 120;
-        public Fire (Texture2D spriteSheet, int x, int y, int width, int height, int animationSpeed, float layer):base(spriteSheet, x, y, width, height, animationSpeed, layer)
+        public Fire (int x, int y, int width, int height, int animationSpeed, float layer):base(x, y, width, height, animationSpeed, layer)
         {
             collision = new Rectangle(x, y, width, height);
             spawnTimer = SPAWNTIME;

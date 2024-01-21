@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Bone_King
@@ -32,17 +33,11 @@ namespace Bone_King
         const int ANIMATIONSPEED = 3, LADDERANIMATIONSPEED = 8, DEATHANIMATIONSPEED = 8, AXESPEED = 15, AXETIME = 400;
         const float GRAVITY = 0.1f, MAXFALL = 3.0f, RUNSPEED = 1.5f, JUMPHEIGHT = -2.0f, JUMPSPEED = 1.5f;
 
-        public Player(Texture2D running, Texture2D axe, Texture2D jumping, Texture2D climbing, Texture2D climbingover, Texture2D death, int x, int y)
+        public Player(int x, int y)
         {
 
             state = State.StandingRight;
 
-            this.running = running;
-            this.axe = axe;
-            this.jumping = jumping;
-            this.climbing = climbing;
-            climbingOver = climbingover;
-            this.death = death;
             position = new Vector2(x, y);
             velocity = Vector2.Zero;
             source = new Rectangle(0, 0, 32, 32);
@@ -59,6 +54,16 @@ namespace Bone_King
             axeTotalTimer = AXETIME;
 
             facingRight = true;
+        }
+
+        public void Load(ContentManager content)
+        {
+            running = content.Load<Texture2D>("Textures\\barryRun");
+            axe = content.Load<Texture2D>("Textures\\barryRunWithAxe");
+            jumping = content.Load<Texture2D>("Textures\\barryJump");
+            climbing = content.Load<Texture2D>("Textures\\barryClimb");
+            climbingOver = content.Load<Texture2D>("Textures\\barryClimbOver");
+            death = content.Load<Texture2D>("Textures\\barryDeath");
         }
 
         private void StartLadderClimb(float xPos, float yPos, int ladder)
@@ -123,23 +128,6 @@ namespace Bone_King
             }
         }
 
-        private void SwitchTimer(ref bool switchBool, ref int timer, int resetValue)
-        {
-            if (timer <= 0)
-            {
-                if (switchBool)
-                    switchBool = false;
-                else
-                    switchBool = true;
-
-                timer = resetValue;
-            }
-            else
-            {
-                timer -= 1;
-            }
-        }
-
         private void SetColliders(int X, int Width, int Height, int axeX)
         {
             collision.X = (int)position.X + X;
@@ -158,10 +146,99 @@ namespace Bone_King
                 axeCollision.X = (int)position.X - (20 - axeX);
         }
 
+        public void Reset(int x, int y)
+        {
+            state = State.StandingRight;
+
+            position.X = x;
+            position.Y = y;
+
+            velocity = Vector2.Zero;
+
+            frameTimer = ANIMATIONSPEED;
+            frame = 0;
+            deathTimer = 30;
+            deathStage = 0;
+            axeSwingTimer = AXESPEED;
+            axeTotalTimer = AXETIME;
+
+            facingRight = true;
+            reset = false;
+            holdingAxe = false;
+        }
+
         public void Update(Input currentInput, Input oldInput, Level level, GameValues gameValues, int maxX, Game1 game)
         {
             if (state == State.Death)
                 return;
+
+            #region Sets size/position of collision rectangles depending on the Animation State
+            collision.Y = (int)position.Y;
+            feetRectangle.Y = (int)position.Y + 29;
+            ladderRectangle.Y = (int)position.Y + 14;
+            axeCollision.Y = (int)position.Y;
+            source.Y = 0;
+            source.Width = 32;
+            source.Height = 32;
+
+            if (state == State.StandingRight || state == State.StandingLeft)
+            {
+                SetColliders(4, 24, 32, 4);
+
+                source.X = 0;
+
+                if (holdingAxe)
+                {
+                    if (axeDown)
+                        source.Y = 48;
+
+                    source.Width = 48;
+                    source.Height = 48;
+                }
+            }
+            if (state == State.RunningRight || state == State.RunningLeft)
+            {
+                SetColliders(1, 30, 32, 1);
+
+                if (holdingAxe)
+                {
+                    if (axeDown)
+                        source.Y = 48;
+
+                    if (source.X % 48 != 0)
+                        source.X = 0;
+
+                    source.Width = 48;
+                    source.Height = 48;
+                }
+                else
+                {
+                    if (source.X % 32 != 0)
+                        source.X = 0;
+                }
+            }
+            if (state == State.JumpingRight || state == State.JumpingLeft)
+            {
+                SetColliders(2, 28, 30, 2);
+
+                source.X = 0;
+            }
+            if (state == State.Climbing)
+            {
+                SetColliders(3, 26, 30, 3);
+
+                source.X = 0;
+            }
+            if (state == State.ClimbingOver)
+            {
+                SetColliders(0, 32, 32, 1);
+
+                if (source.X % 32 != 0)
+                {
+                    source.X = 0;
+                }
+            }
+            #endregion
 
             bool climbing = state == State.Climbing || state == State.ClimbingOver;
 
@@ -239,7 +316,21 @@ namespace Bone_King
 
                 //Flips sprite left and right while climbing
                 if (moving)
-                    SwitchTimer(ref facingRight, ref frameTimer, LADDERANIMATIONSPEED);
+                {
+                    if (frameTimer > 0)
+                    {
+                        frameTimer -= 1;
+                    }
+                    else
+                    {
+                        if (facingRight)
+                            facingRight = false;
+                        else
+                            facingRight = true;
+
+                        frameTimer = LADDERANIMATIONSPEED;
+                    }
+                }
 
                 //Moves Barry down if he goes above the climbable section of any broken ladder
                 if (!collision.Intersects(level.ladders[climbedLadder].Body))
@@ -261,19 +352,31 @@ namespace Bone_King
 
             #region Axe
             //Time the axe swing
-            SwitchTimer(ref axeDown, ref axeSwingTimer, AXESPEED);
+            if (axeSwingTimer > 0)
+            {
+                axeSwingTimer -= 1;
+            }
+            else
+            {
+                if (axeDown)
+                    axeDown = false;
+                else
+                    axeDown = true;
+
+                axeSwingTimer = AXESPEED;
+            }
 
             //Stop holding axe after some time
             if (holdingAxe)
             {
-                if (axeTotalTimer <= 0)
+                if (axeTotalTimer > 0)
                 {
-                    holdingAxe = false;
-                    axeTotalTimer = AXETIME;
+                    axeTotalTimer -= 1;
                 }
                 else
                 {
-                    axeTotalTimer -= 1;
+                    holdingAxe = false;
+                    axeTotalTimer = AXETIME;
                 }
             }
             #endregion
@@ -297,306 +400,201 @@ namespace Bone_King
             }
 
             position += velocity;
-
-            #region Sets size/position of collision rectangles depending on the Animation State
-            collision.Y = (int)position.Y;
-            feetRectangle.Y = (int)position.Y + 29;
-            ladderRectangle.Y = (int)position.Y + 14;
-            axeCollision.Y = (int)position.Y;
-            source.Y = 0;
-            source.Width = 32;
-            source.Height = 32;
-
-            if (state == State.StandingRight || state == State.StandingLeft)
-            {
-                SetColliders(4, 24, 32, 4);
-
-                source.X = 0;
-
-                if (holdingAxe)
-                {
-                    if (axeDown)
-                        source.Y = 48;
-
-                    source.Width = 48;
-                    source.Height = 48;
-                }
-            }
-            if (state == State.RunningRight || state == State.RunningLeft)
-            {
-                SetColliders(1, 30, 32, 1);
-
-                if (holdingAxe)
-                {
-                    if (axeDown)
-                        source.Y = 48;
-
-                    if (source.X % 48 != 0)
-                        source.X = 0;
-
-                    source.Width = 48;
-                    source.Height = 48;
-                }
-                else
-                {
-                    if (source.X % 32 != 0)
-                        source.X = 0;
-                }
-            }
-            if (state == State.JumpingRight || state == State.JumpingLeft)
-            {
-                SetColliders(2, 28, 30, 2);
-
-                source.X = 0;
-            }
-            if (state == State.Climbing)
-            {
-                SetColliders(3, 26, 30, 3);
-
-                source.X = 0;
-            }
-            if (state == State.ClimbingOver)
-            {
-                SetColliders(0, 32, 32, 1);
-
-                if (source.X % 32 != 0)
-                {
-                    source.X = 0;
-                }
-            }
-            #endregion
-        }
-
-        public void Reset(int x, int y)
-        {
-            state = State.StandingRight;
-
-            position = new Vector2(x, y);
-            velocity = Vector2.Zero;
-            source = new Rectangle(0, 0, 32, 32);
-            feetRectangle = new Rectangle(x + 4, y + 29, 26, 3);
-            ladderRectangle = new Rectangle(x + 4, y + 14, 26, 3);
-            collision = new Rectangle(x + 4, y, 26, 32);
-
-            frameTimer = ANIMATIONSPEED;
-            frame = 0;
-            deathTimer = 30;
-            deathStage = 0;
-            axeSwingTimer = AXESPEED;
-            axeTotalTimer = AXETIME;
-
-            facingRight = true;
-            reset = false;
-            holdingAxe = false;
         }
 
         public void DeathUpdate(Game1 game)
         {
-            if (game.paused == false)
+            if (game.paused || state != State.Death)
             {
-                if (state == State.Death)
-                {
-                    if (deathStage == 0)
+                return;
+            }
+
+            switch (deathStage)
+            {
+                case 0:
+                    source.X = 0;
+                    source.Y = 0;
+                    source.Width = 32;
+                    source.Height = 32;
+
+                    if (deathTimer > 0)
                     {
-                        if (deathTimer <= 0)
+                        deathTimer -= 1;
+                    }
+                    else
+                    {
+                        deathStage = 1;
+                        deathTimer = 150;
+                        source.X = 32;
+                        if (game.deathSongInstance == null)
                         {
-                            deathStage = 1;
-                            deathTimer = 150;
-                            source.X = 32;
-                            if (game.deathSongInstance == null)
-                            {
-                                game.deathSongInstance = game.deathSong.CreateInstance();
-                                game.deathSongInstance.Volume = 0.5f;
-                                game.deathSongInstance.Play();
-                            }
-                        }
-                        else
-                        {
-                            deathTimer -= 1;
+                            game.deathSongInstance = game.deathSong.CreateInstance();
+                            game.deathSongInstance.Volume = 0.5f;
+                            game.deathSongInstance.Play();
                         }
                     }
-                    if (deathStage == 1)
+                    break;
+                case 1:
+                    if (deathTimer > 0)
                     {
-                        if (deathTimer <= 0)
-                        {
-                            deathStage = 2;
-                            deathTimer = 150;
-                        }
-                        else
-                        {
-                            deathTimer -= 1;
-                        }
+                        deathTimer -= 1;
                     }
-                    if (deathStage == 2)
+                    else
                     {
-                        if (deathTimer <= 0)
-                        {
-                            reset = true;
-                        }
-                        else
-                        {
-                            deathTimer -= 1;
-                        }
+                        deathStage = 2;
+                        deathTimer = 150;
                     }
-                }
+                    break;
+                case 2:
+                    if (deathTimer > 0)
+                        deathTimer -= 1;
+                    else
+                        reset = true;
+                    break;
             }
         }
 
         public void Draw(SpriteBatch sb, Game1 game)
         {
-            #region Draws based on animState
             switch (state)
             {
                 case State.StandingRight:
                     if (holdingAxe)
-                    {
                         sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(0, 16), 1, SpriteEffects.FlipHorizontally, 0.9f);
-                    }
                     else
-                    {
                         sb.Draw(running, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
-                    }
                     break;
+
                 case State.StandingLeft:
                     if (holdingAxe)
-                    {
                         sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(20, 16), 1, SpriteEffects.None, 0.9f);
-                    }
                     else
-                    {
                         sb.Draw(running, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
-                    }
                     break;
+
                 case State.RunningRight:
                     if (holdingAxe)
-                    {
                         sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(0, 16), 1, SpriteEffects.FlipHorizontally, 0.9f);
-                    }
                     else
-                    {
                         sb.Draw(running, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
-                    }
-                    if (game.paused == false)
+
+                    if (game.paused)
                     {
-                        if (frameTimer <= 0)
-                        {
-                            source.X += source.Width;
-                            if (source.X >= running.Width)
-                            {
-                                source.X = 0;
-                            }
-                            frameTimer = ANIMATIONSPEED;
-                        }
-                        else
-                        {
-                            frameTimer -= 1;
-                        }
+                        break;
                     }
-                    break;
-                case State.RunningLeft:
-                    if (holdingAxe)
+
+                    if (frameTimer > 0)
                     {
-                        sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(20, 16), 1, SpriteEffects.None, 0.9f);
+                        frameTimer -= 1;
                     }
                     else
                     {
-                        sb.Draw(running, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
-                    }
-                    if (game.paused == false)
-                    {
-                        if (frameTimer <= 0)
-                        {
-                            source.X += source.Width;
-                            if (source.X >= running.Width)
-                            {
-                                source.X = 0;
-                            }
-                            frameTimer = ANIMATIONSPEED;
-                        }
-                        else
-                        {
-                            frameTimer -= 1;
-                        }
-                    }
-                    break;
-                case State.JumpingRight:
-                    sb.Draw(jumping, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
-                    break;
-                case State.JumpingLeft:
-                    sb.Draw(jumping, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
-                    break;
-                case State.Climbing:
-                    if (facingRight)
-                    {
-                        sb.Draw(climbing, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
-                    }
-                    else
-                    {
-                        sb.Draw(climbing, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
-                    }
-                    break;
-                case State.ClimbingOver:
-                    sb.Draw(climbingOver, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
-                    if (game.paused == false)
-                    {
-                        if (frameTimer <= 0)
-                        {
-                            source.X += source.Width;
-                            if (source.X >= climbingOver.Width)
-                            {
-                                frameTimer = 0;
-                                source.X = 0;
-                                state = State.StandingLeft;
-                                frame = 0;
-                            }
-                            if (frame == 0 && state != State.StandingLeft)
-                            {
-                                position.Y -= 4;
-                            }
-                            if (frame == 1)
-                            {
-                                position.Y -= 15;
-                            }
-                            frame += 1;
-                            frameTimer = LADDERANIMATIONSPEED;
-                        }
-                        else
-                        {
-                            frameTimer -= 1;
-                        }
-                    }
-                    break;
-                case State.Death:
-                    if (deathStage == 0)
-                    {
-                        if (source.X % 32 != 0)
+                        source.X += source.Width;
+                        if (source.X >= running.Width)
                         {
                             source.X = 0;
                         }
-                        source.X = 0;
-                        source.Y = 0;
-                        source.Width = 32;
-                        source.Height = 32;
+                        frameTimer = ANIMATIONSPEED;
+                    }
+           
+                    break;
+
+                case State.RunningLeft:
+                    if (holdingAxe)
+                        sb.Draw(axe, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, new Vector2(20, 16), 1, SpriteEffects.None, 0.9f);
+                    else
+                        sb.Draw(running, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
+
+                    if (game.paused)
+                    {
+                        break;
+                    }
+
+                    if (frameTimer > 0)
+                    {
+                        frameTimer -= 1;
+                    }
+                    else
+                    {
+                        source.X += source.Width;
+                        if (source.X >= running.Width)
+                        {
+                            source.X = 0;
+                        }
+                        frameTimer = ANIMATIONSPEED;
+                    }
+                    
+                    break;
+
+                case State.JumpingRight:
+                    sb.Draw(jumping, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
+                    break;
+
+                case State.JumpingLeft:
+                    sb.Draw(jumping, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
+                    break;
+
+                case State.Climbing:
+                    if (facingRight)
+                        sb.Draw(climbing, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
+                    else
+                        sb.Draw(climbing, new Vector2((int)position.X, (int)position.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.9f);
+
+                    break;
+                case State.ClimbingOver:
+                    sb.Draw(climbingOver, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
+                    if (game.paused)
+                    {
+                        break;
+                    }
+
+                    if (frameTimer > 0)
+                    {
+                        frameTimer -= 1;
+                    }
+                    else
+                    {
+                        source.X += source.Width;
+                        if (source.X >= climbingOver.Width)
+                        {
+                            frameTimer = 0;
+                            source.X = 0;
+                            state = State.StandingLeft;
+                            frame = 0;
+                        }
+                        if (frame == 0 && state != State.StandingLeft)
+                        {
+                            position.Y -= 4;
+                        }
+                        if (frame == 1)
+                        {
+                            position.Y -= 15;
+                        }
+                        frame += 1;
+                        frameTimer = LADDERANIMATIONSPEED;
+                    }
+                    break;
+
+                case State.Death:
+                    if (deathStage == 0)
+                    {
                         sb.Draw(death, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     }
                     if (deathStage == 1)
                     {
                         sb.Draw(death, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
-                        if (game.paused == false)
+
+                        if (frameTimer > 0)
                         {
-                            if (frameTimer <= 0)
-                            {
-                                source.X += 32;
-                                frameTimer = DEATHANIMATIONSPEED;
-                                if (source.X >= 160)
-                                {
-                                    source.X = 32;
-                                }
-                            }
-                            else
-                            {
-                                frameTimer -= 1;
-                            }
+                            frameTimer -= 1;
+                        }
+                        else
+                        {
+                            source.X += 32;
+                            frameTimer = DEATHANIMATIONSPEED;
+
+                            if (source.X >= 160)
+                                source.X = 32;
                         }
                     }
                     if (deathStage == 2)
@@ -605,11 +603,7 @@ namespace Bone_King
                         sb.Draw(death, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.9f);
                     }
                     break;
-                default:
-                    //panic
-                    break;
             }
-            #endregion
         }
 #if DEBUG
         public void DebugDraw(SpriteBatch sb, Texture2D hitBox, SpriteFont font)
