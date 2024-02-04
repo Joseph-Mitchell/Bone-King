@@ -9,11 +9,15 @@ namespace Bone_King
         public Vector2 position;
         protected float layer;
 
-        public Sprite(Texture2D texture, int x, int y, float layer)
-        {
-            this.texture = texture;
+        public Sprite(int x, int y, float layer)
+        {       
             position = new Vector2(x, y);
             this.layer = layer;
+        }
+
+        public void Load(Texture2D texture)
+        {
+            this.texture = texture;
         }
 
         public void Draw(SpriteBatch spriteBatch)

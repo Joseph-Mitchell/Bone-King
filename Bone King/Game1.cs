@@ -82,7 +82,17 @@ namespace Bone_King
 
             reusedTextures = new Dictionary<string, Texture2D>();
 
+            menuBackground = new Sprite(0, 0, 0.1f);
+            pauseScreen = new Sprite(0, 0, 1);
+            gameOver = new Sprite(0, 0, 1);
+            finalScore = new Sprite(0, 0, 0);
+            bonePile = new Sprite(0, 62, 0.9f);
             pages = new Sprite[5];
+            for (int i = 0; i < pages.Length; i++)
+            {
+                pages[i] = new Sprite(0, 0, 0.1f);
+            }
+
             bones = new List<Bone>();
             specialBones = new List<SpecialBone>();
             skulls = new List<Skull>();
@@ -118,14 +128,14 @@ namespace Bone_King
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             #region New Classes
-            menuBackground = new Sprite(Content.Load<Texture2D>("Textures\\menubackground"), 0, 0, 0.1f);
-            pauseScreen = new Sprite(Content.Load<Texture2D>("Textures\\pausescreen"), 0, 0, 1);
-            gameOver = new Sprite(Content.Load<Texture2D>("Textures\\gameoverscreen"), 0, 0, 1);
-            finalScore = new Sprite(Content.Load<Texture2D>("Textures\\finalscore"), 0, 0, 0);
-            bonePile = new Sprite(Content.Load<Texture2D>("Textures\\bonepile"), 0, 62, 0.9f);
+            menuBackground.Load(Content.Load<Texture2D>("Textures\\menubackground"));
+            pauseScreen.Load(Content.Load<Texture2D>("Textures\\pausescreen"));
+            gameOver.Load(Content.Load<Texture2D>("Textures\\gameoverscreen"));
+            finalScore.Load(Content.Load<Texture2D>("Textures\\finalscore"));
+            bonePile.Load(Content.Load<Texture2D>("Textures\\bonepile"));
             for (int i = 0; i < pages.Length; i++)
             {
-                pages[i] = new Sprite(Content.Load<Texture2D>("Textures\\page-" + i), 0, 0, 0.1f);
+                pages[i].Load(Content.Load<Texture2D>("Textures\\page-" + i));
             }
             menuButtons[0] = new Button(Content.Load<Texture2D>("Textures\\playbutton"), graphics.PreferredBackBufferWidth / 2, 180, ButtonEffect.Play)
             {
