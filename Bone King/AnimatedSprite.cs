@@ -87,7 +87,7 @@ namespace Bone_King
             }
         }
 
-        public void Draw (SpriteBatch spriteBatch)
+        new public void Draw (SpriteBatch spriteBatch)
         {
             if (frameTimer > 0)
             {
