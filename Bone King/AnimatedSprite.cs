@@ -4,17 +4,15 @@ using System.Collections.Generic;
 
 namespace Bone_King
 {
-    class AnimatedSprite
+    class AnimatedSprite : Sprite
     {
         List<Texture2D> sheets;
         List<Vector2> sourceSizes;
-        public Vector2 position;
         Vector2 range; //X = min, Y = max
         Rectangle source;
         SpriteEffects spriteEffects;
 
         int frameTimer, animationSpeed, sheet;
-        float layer;
 
         //Flags when a frame of animation is finished
         public bool FrameFlag
@@ -38,33 +36,27 @@ namespace Bone_King
             set { source.Y = source.Height * value; }
         }
 
-        public AnimatedSprite(int x, int y, int animationSpeed, float layer, Vector2 sourceSize)
+        public AnimatedSprite(int x, int y, int animationSpeed, float layer, Vector2 sourceSize) : base(x, y, layer)
         {
-            position = new Vector2(x, y);
-
             sourceSizes = new List<Vector2>{sourceSize};
             source = new Rectangle(0, 0, (int)sourceSizes[0].X, (int)sourceSizes[0].Y);
 
             frameTimer = animationSpeed;
             this.animationSpeed = animationSpeed;
-            this.layer = layer;
             spriteEffects = SpriteEffects.None;
         }
 
-        public AnimatedSprite (int x, int y, int animationSpeed, float layer, List<Vector2> sourceSizes)
+        public AnimatedSprite (int x, int y, int animationSpeed, float layer, List<Vector2> sourceSizes) : base(x, y, layer)
         {
-            position = new Vector2(x, y);
-
             this.sourceSizes = sourceSizes;
             source = new Rectangle(0, 0, (int)sourceSizes[0].X, (int)sourceSizes[0].Y);
 
             frameTimer = animationSpeed;
             this.animationSpeed = animationSpeed;
-            this.layer = layer;
             spriteEffects = SpriteEffects.None;
         }
 
-        public void Load (Texture2D spritesheet)
+        new public void Load (Texture2D spritesheet)
         {
             sheets = new List<Texture2D>{spritesheet};
         }
