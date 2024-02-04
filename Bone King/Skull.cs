@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace Bone_King
 {
@@ -9,39 +8,48 @@ namespace Bone_King
         enum State
         {
             Ladder,
-            MovingLeft,
-            MovingRight,
-            None
+            Moving,
         }
 
-        Texture2D spriteSheet;
+        AnimatedSprite sprite;
         Vector2 position, velocity;
-        Rectangle source;
         public Rectangle collision;
 
         State state;
 
-        int frameTimer;
-        bool vulnerable, ladderIntersect;
+        bool vulnerable, ladderIntersect, facingRight;
         public bool active;
 
         const int ANIMATIONSPEED = 15;
         const float GRAVITY = 0.1f, MOVEMENTSPEED = 0.7f;
 
-        public Skull (Texture2D spriteSheet, int x, int y)
+        public Skull (int x, int y, Texture2D spriteSheet)
         {
-            this.spriteSheet = spriteSheet;
+            sprite = new AnimatedSprite(x, y, ANIMATIONSPEED, 1, new Vector2(30, 32));
             position = new Vector2(x, y);
-            source = new Rectangle(0, 0, 30, 32);
             collision = new Rectangle(x, y, 30, 32);
 
-            state = State.MovingRight;
-
-            frameTimer = ANIMATIONSPEED;
+            facingRight = true;
+            SetState(State.Moving);
             active = true;
+
+            sprite.Load(spriteSheet);
         }
 
-        public void Update(Level background, Random RNG, int maxX, Player player)
+        public void Load(Texture2D spriteSheet)
+        {
+            sprite.Load(spriteSheet);
+        }
+
+        private void SetState(State newState)
+        {
+            state = newState;
+
+            SpriteEffects spriteEffects = facingRight ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            sprite.ChangeSheet(0, spriteEffects: spriteEffects);
+        }
+
+        public void Update(Level background, int maxX, Player player)
         {
             //Gravity
             if (velocity.Y < GRAVITY * 30 && state != State.Ladder)
@@ -83,97 +91,55 @@ namespace Bone_King
             //Moves depending on state
             if (state == State.Ladder && !ladderIntersect)
             {
-                state = State.None;
-            }
-            if ((position.Y >= 359 || (position.Y >= 239 && position.Y < 299) || (position.Y >= 119 && position.Y < 179)) && state != State.Ladder)
-            {
-                state = State.MovingRight;
-            }
-            else if (((position.Y < 359 && position.Y >= 299) || (position.Y < 239 && position.Y >= 179) || (position.Y < 119)) && state != State.Ladder)
-            {
-                state = State.MovingLeft;
+                if ((position.Y >= 359 || (position.Y >= 239 && position.Y < 299) || (position.Y >= 119 && position.Y < 179)))
+                    facingRight = true;
+                else if (((position.Y < 359 && position.Y >= 299) || (position.Y < 239 && position.Y >= 179) || (position.Y < 119)))
+                    facingRight = false;
+
+                SetState(State.Moving);
             }
 
             //Movement
-            if (state == State.MovingLeft)
+            if (state == State.Moving)
             {
-                velocity.X = -MOVEMENTSPEED;
-            }
-            else if (state == State.MovingRight)
-            {
-                velocity.X = MOVEMENTSPEED;
+                if (facingRight)
+                    velocity.X = MOVEMENTSPEED;
+                else
+                    velocity.X = -MOVEMENTSPEED;
             }
             else if (state == State.Ladder)
             {
                 velocity.X = 0;
                 velocity.Y = -MOVEMENTSPEED;
             }
-            else if (state == State.None)
-            {
-                velocity.X = 0;
-                velocity.Y = 0;
-            }
 
             //Stops the skull from going off the screen
             if (collision.X + collision.Width > maxX)
-            {
                 position.X -= MOVEMENTSPEED;
-            }
             if (collision.X < 0)
-            {
                 position.X += MOVEMENTSPEED;
-            }
 
             //Changes the sprites for when Barry has the axe
             if (player.holdingAxe)
-            {
                 vulnerable = true;
-            }
             else
-            {
                 vulnerable = false;
-            }
+
             if (vulnerable)
-            {
-                source.Y = 32;
-            }
+                sprite.YLayer = 1;
             else
-            {
-                source.Y = 0;
-            }
+                sprite.YLayer = 0;
 
             collision.X = (int)position.X;
             collision.Y = (int)position.Y;
 
             position += velocity;
+            sprite.position = position;
         }
 
-        public void Draw(SpriteBatch sb, Game1 game)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            if (game.paused == false)
-            {
-                if (frameTimer <= 0)
-                {
-                    source.X += source.Width;
-                    if (source.X >= spriteSheet.Width)
-                    {
-                        source.X = 0;
-                    }
-                    frameTimer = ANIMATIONSPEED;
-                }
-                else
-                {
-                    frameTimer -= 1;
-                }
-            }
-            if (state == State.MovingRight)
-            {
-                sb.Draw(spriteSheet, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0.8f);
-            }
-            else
-            {
-                sb.Draw(spriteSheet, new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.8f);
-            }
+            sprite.Draw(spriteBatch);
         }
 #if DEBUG
         public void DebugDraw(SpriteBatch sb, Texture2D texture)

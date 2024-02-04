@@ -1,21 +1,31 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace Bone_King
 {
-    class Fire : AnimatedSprite
+    class Fire
     {
         public Rectangle collision;
+
+        AnimatedSprite sprite;
 
         int spawnTimer;
         bool readyToSpawn;
         public bool spawning;
 
         const int SPAWNTIME = 120;
-        public Fire (int x, int y, int width, int height, int animationSpeed, float layer):base(x, y, width, height, animationSpeed, layer)
+        public Fire (int x, int y, int width, int height, int animationSpeed, float layer)
         {
+            sprite = new AnimatedSprite(x, y, animationSpeed, layer, new Vector2(30, 36)); 
+
             collision = new Rectangle(x, y, width, height);
             spawnTimer = SPAWNTIME;
+        }
+
+        public void Load(Texture2D spriteSheet)
+        {
+            sprite.Load(spriteSheet);
         }
 
         public void Reset()
@@ -49,6 +59,11 @@ namespace Bone_King
                     spawnTimer -= 1;
                 }
             }
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            sprite.Draw(spriteBatch);
         }
     }
 }

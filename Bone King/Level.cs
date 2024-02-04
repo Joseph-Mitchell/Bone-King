@@ -3,16 +3,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Bone_King
 {
-    public struct Ladder
+    public class Ladder
     {
-        public Ladder(int xPos, int yPos, int topPos, int height)
+        public Ladder(int xPos, int yPos, int topPos, int height, bool broken)
         {
             Body = new Rectangle(xPos, yPos, 16, height);
             Top = new Rectangle(xPos, topPos, 16, 18);
+            Broken = broken;
         }
 
         public Rectangle Body { get; }
         public Rectangle Top { get; }
+        public bool Broken { get; }
     }
     class Level
     {
@@ -96,19 +98,19 @@ namespace Bone_King
             platformHitBoxes[48] = new Rectangle(208, 63, 96, 3);
             #endregion
 
-            ladders[0] = new Ladder(210, 390, 336, 25);
-            ladders[1] = new Ladder(382, 360, 342, 49);
-            ladders[2] = new Ladder(238, 326, 278, 25);
-            ladders[3] = new Ladder(94, 302, 284, 43);
-            ladders[4] = new Ladder(172, 270, 214, 25);
-            ladders[5] = new Ladder(270, 266, 218, 25);
-            ladders[6] = new Ladder(382, 240, 222, 47);
-            ladders[7] = new Ladder(334, 210, 154, 25);
-            ladders[8] = new Ladder(188, 178, 160, 51);
-            ladders[9] = new Ladder(94, 182, 164, 43);
-            ladders[10] = new Ladder(228, 148, 96, 25);
-            ladders[11] = new Ladder(382, 120, 102, 47);
-            ladders[12] = new Ladder(288, 66, 48, 47);
+            ladders[0] = new Ladder(210, 390, 336, 25, true);
+            ladders[1] = new Ladder(382, 360, 342, 49, false);
+            ladders[2] = new Ladder(238, 326, 278, 25, true);
+            ladders[3] = new Ladder(94, 302, 284, 43, false);
+            ladders[4] = new Ladder(172, 270, 214, 25, true);
+            ladders[5] = new Ladder(270, 266, 218, 25, true);
+            ladders[6] = new Ladder(382, 240, 222, 47, false);
+            ladders[7] = new Ladder(334, 210, 154, 25, true);
+            ladders[8] = new Ladder(188, 178, 160, 51, false);
+            ladders[9] = new Ladder(94, 182, 164, 43, false);
+            ladders[10] = new Ladder(228, 148, 96, 25, true);
+            ladders[11] = new Ladder(382, 120, 102, 47, false);
+            ladders[12] = new Ladder(288, 66, 48, 47, false);
 
             for (int i = 0; i < ladders.Length; i++)
             {

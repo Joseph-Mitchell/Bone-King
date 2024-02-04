@@ -22,6 +22,7 @@ namespace Bone_King
         public GameState gameState;
 
         //Classes
+        Dictionary<string, Texture2D> reusedTextures;
         Texture2D hitBoxTexture;
         SpriteFont debugFont, mainFont, bigFont;
         GraphicsDeviceManager graphics;
@@ -35,8 +36,8 @@ namespace Bone_King
         Video introVideo, cutscene2;
 
         //New Classes
-        StaticObject menuBackground, pauseScreen, gameOver, finalScore, bonePile;
-        StaticObject[] pages;
+        Sprite menuBackground, pauseScreen, gameOver, finalScore, bonePile;
+        Sprite[] pages;
         List<Scores> scores;
         ButtonManager buttonManager;
         Button[] menuButtons = new Button[3];
@@ -61,7 +62,7 @@ namespace Bone_King
         int currentButton;
         public int lives, instructionPage;
 
-        const int HIGHSCOREBLINKTIME = 51;
+        const int HIGHSCOREBLINKTIME = 51, PLAYERSTARTX = 80, PLAYERSTARTY = 384;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -79,16 +80,19 @@ namespace Bone_King
             introInstance = null;
             applauseInstance = null;
 
-            pages = new StaticObject[5];
+            reusedTextures = new Dictionary<string, Texture2D>();
+
+            pages = new Sprite[5];
             bones = new List<Bone>();
             specialBones = new List<SpecialBone>();
             skulls = new List<Skull>();
             axes = new Axe[4];
             scores = new List<Scores>();
-            beatrice = new AnimatedSprite(169, 35, 30, 44, 30, 1);
+            boney = new BoneKing(42, 41);
+            beatrice = new AnimatedSprite(169, 35, 30, 1, new List<Vector2>() {new Vector2(30, 44)});
             fire = new Fire(78, 379, 30, 36, 15, 0.8f);
 
-            player = new Player(80, 380);
+            player = new Player(PLAYERSTARTX, PLAYERSTARTY);
 
             buttonManager = ButtonManager.Instance(this);
 
@@ -114,14 +118,14 @@ namespace Bone_King
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             #region New Classes
-            menuBackground = new StaticObject(Content.Load<Texture2D>("Textures\\menubackground"), 0, 0, 0.1f);
-            pauseScreen = new StaticObject(Content.Load<Texture2D>("Textures\\pausescreen"), 0, 0, 1);
-            gameOver = new StaticObject(Content.Load<Texture2D>("Textures\\gameoverscreen"), 0, 0, 1);
-            finalScore = new StaticObject(Content.Load<Texture2D>("Textures\\finalscore"), 0, 0, 0);
-            bonePile = new StaticObject(Content.Load<Texture2D>("Textures\\bonepile"), 0, 62, 0.9f);
+            menuBackground = new Sprite(Content.Load<Texture2D>("Textures\\menubackground"), 0, 0, 0.1f);
+            pauseScreen = new Sprite(Content.Load<Texture2D>("Textures\\pausescreen"), 0, 0, 1);
+            gameOver = new Sprite(Content.Load<Texture2D>("Textures\\gameoverscreen"), 0, 0, 1);
+            finalScore = new Sprite(Content.Load<Texture2D>("Textures\\finalscore"), 0, 0, 0);
+            bonePile = new Sprite(Content.Load<Texture2D>("Textures\\bonepile"), 0, 62, 0.9f);
             for (int i = 0; i < pages.Length; i++)
             {
-                pages[i] = new StaticObject(Content.Load<Texture2D>("Textures\\page-" + i), 0, 0, 0.1f);
+                pages[i] = new Sprite(Content.Load<Texture2D>("Textures\\page-" + i), 0, 0, 0.1f);
             }
             menuButtons[0] = new Button(Content.Load<Texture2D>("Textures\\playbutton"), graphics.PreferredBackBufferWidth / 2, 180, ButtonEffect.Play)
             {
@@ -133,20 +137,29 @@ namespace Bone_King
             instructionButtons[1] = new Button(Content.Load<Texture2D>("Textures\\menubutton"), graphics.PreferredBackBufferWidth / 2, 17, ButtonEffect.Menu);
             instructionButtons[2] = new Button(Content.Load<Texture2D>("Textures\\arrow"), graphics.PreferredBackBufferWidth - 18, 18, ButtonEffect.Right);
             level = new Level(Content.Load<Texture2D>("Textures\\background"));
-            player.Load(Content);
-            boney = new BoneKing(Content.Load<Texture2D>("Textures\\standingBoneKing"),
-                Content.Load<Texture2D>("Textures\\throwingBoneKing"),
+            player.Load(new List<Texture2D>{
+                Content.Load<Texture2D>("Textures\\barryRun"),
+                Content.Load<Texture2D>("Textures\\barryRunWithAxe"),
+                Content.Load<Texture2D>("Textures\\barryJump"),
+                Content.Load<Texture2D>("Textures\\barryClimb"),
+                Content.Load<Texture2D>("Textures\\barryClimbOver"),
+                Content.Load<Texture2D>("Textures\\barryDeath")});
+            boney.Load(new List<Texture2D>{
+                Content.Load<Texture2D>("Textures\\standingBoneKing"),
                 Content.Load<Texture2D>("Textures\\angeryBoneKing"),
-                Content.Load<Texture2D>("Textures\\specialBoneKing"),
-                42, 41);
-            beatrice.Load(new List<Texture2D>() {Content.Load<Texture2D>("Textures\\beatrice")});            
-            fire.Load(new List<Texture2D>() { Content.Load<Texture2D>("Textures\\fire") });
+                Content.Load<Texture2D>("Textures\\throwingBoneKing"),
+                Content.Load<Texture2D>("Textures\\specialBoneKing") });
+            beatrice.Load(Content.Load<Texture2D>("Textures\\beatrice"));
+            fire.Load(Content.Load<Texture2D>("Textures\\fire"));
             axes[0] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 24, 310);
             axes[1] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 470, 250);
             axes[2] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 24, 190);
             axes[3] = new Axe(Content.Load<Texture2D>("Textures\\axe"), 470, 130);
-            int potato = RNG.Next(0, 4);
-            axes[potato].active = true;
+            int random = RNG.Next(0, 4);
+            axes[random].active = true;
+
+            reusedTextures.Add("boneRoll", Content.Load<Texture2D>("Textures\\boneRoll"));
+            reusedTextures.Add("boneRollLadder", Content.Load<Texture2D>("Textures\\boneRollLadder"));
             #endregion
 
             //Textures
@@ -220,14 +233,14 @@ namespace Bone_King
             {
                 gameState = GameState.Cutscene2;
             }
-            player.Reset(80, 380);
+            player.Reset(PLAYERSTARTX, PLAYERSTARTY);
             boney.Reset(gameValues);
             fire.Reset();
 
             timer = gameValues.initialTime;
 
-            int potato = RNG.Next(0, 4);
-            axes[potato].active = true;
+            int random = RNG.Next(0, 4);
+            axes[random].active = true;
         }
 
         //Called when player dies and has no remaining lives
@@ -261,7 +274,7 @@ namespace Bone_King
             skulls.RemoveAll(s => s.active == false);
             scores.RemoveAll(s => s.active == false);
 
-            player.Reset(80, 380);
+            player.Reset(PLAYERSTARTX, PLAYERSTARTY);
             boney.Reset(gameValues);
             fire.Reset();
 
@@ -540,7 +553,7 @@ namespace Bone_King
                             #region Bone Updates
                             for (int i = 0; i < bones.Count; i++)
                             {
-                                bones[i].Update(level, RNG, gameValues);
+                                bones[i].Update(level, RNG, gameValues.multiplier);
                                 //Deactivates bone if collides with axe 
                                 if (bones[i].playerCollision.Intersects(player.axeCollision) && player.holdingAxe)
                                 {
@@ -562,7 +575,7 @@ namespace Bone_King
                                     lives -= 1;
                                 }
                                 //Set a flag to true if player jumps over a bone
-                                if (bones[i].scoreCollision.Intersects(player.collision) && (player.state == Player.State.JumpingLeft || player.state == Player.State.JumpingRight) && bones[i].state != Bone.State.Ladder)
+                                if (bones[i].scoreCollision.Intersects(player.collision) && player.state == Player.State.Jumping)
                                 {
                                     currentScoreCollision = true;
                                 }
@@ -572,7 +585,7 @@ namespace Bone_King
                             #region SpecialBone Updates
                             for (int i = 0; i < specialBones.Count; i++)
                             {
-                                specialBones[i].Update(gameTime, level, this);
+                                specialBones[i].Update(level.platformHitBoxes, bang);
 
                                 //Kill player if collision intersects player
                                 if (specialBones[i].collision.Intersects(player.collision))
@@ -591,7 +604,7 @@ namespace Bone_King
                             #region Skull
                             for (int i = 0; i < skulls.Count; i++)
                             {
-                                skulls[i].Update(level, RNG, graphics.PreferredBackBufferWidth, player);
+                                skulls[i].Update(level, graphics.PreferredBackBufferWidth, player);
 
                                 //Kill player if collision intersects player
                                 if (skulls[i].collision.Intersects(player.collision))
@@ -634,7 +647,7 @@ namespace Bone_King
                                 if (axes[i].collision.Intersects(player.collision) && axes[i].active)
                                 {
                                     axes[i].active = false;
-                                    player.holdingAxe = true;
+                                    player.GetAxe();
                                     playLoopInstance.Stop();
 
                                     //Play music
@@ -676,20 +689,22 @@ namespace Bone_King
                             fire.Update(specialBones);
                             if (fire.spawning)
                             {
-                                skulls.Add(new Skull(Content.Load<Texture2D>("Textures\\skull"), 78, 379));
+                                skulls.Add(new Skull(78, 379, Content.Load<Texture2D>("Textures\\skull")));
                                 fire.spawning = false;
                             }
 
                             #region Boney
-                            boney.Update(gameTime, RNG, gameValues);
+                            boney.Update(RNG, gameValues);
                             if (boney.boneDrop)
                             {
-                                bones.Add(new Bone(Content.Load<Texture2D>("Textures\\boneRoll"), Content.Load<Texture2D>("Textures\\boneRollLadder"), gameValues, 127, 102));
+                                bones.Add(new Bone(127, 105, new List<Texture2D>() {
+                                    reusedTextures["boneRoll"],
+                                    reusedTextures["boneRollLadder"]}));
                                 boney.boneDrop = false;
                             }
                             if (boney.specialBoneDrop)
                             {
-                                specialBones.Add(new SpecialBone(Content.Load<Texture2D>("Textures\\specialBoneLadder"), 65, 80));
+                                specialBones.Add(new SpecialBone(65, 80, Content.Load<Texture2D>("Textures\\specialBoneLadder")));
                                 boney.specialBoneDrop = false;
                             }
                             //If player collides with boney, kill player
@@ -872,7 +887,7 @@ namespace Bone_King
                     #region New Classes
                     level.Draw(spriteBatch);
                     bonePile.Draw(spriteBatch);
-                    player.Draw(spriteBatch, this);
+                    player.Draw(spriteBatch);
                     boney.Draw(spriteBatch);
                     beatrice.Draw(spriteBatch);
                     fire.Draw(spriteBatch);
@@ -886,7 +901,7 @@ namespace Bone_King
                     }
                     for (int i = 0; i < skulls.Count; i++)
                     {
-                        skulls[i].Draw(spriteBatch, this);
+                        skulls[i].Draw(spriteBatch);
                     }
                     for (int i = 0; i < axes.Length; i++)
                     {
@@ -978,11 +993,11 @@ namespace Bone_King
                 level.DebugDraw(spriteBatch, hitBoxTexture);
                 for (int i = 0; i < bones.Count; i++)
                 {
-                    bones[i].DebugDraw(spriteBatch, hitBoxTexture, debugFont);
+                    bones[i].DebugDraw(spriteBatch, hitBoxTexture);
                 }
                 for (int i = 0; i < specialBones.Count; i++)
                 {
-                    specialBones[i].DebugDraw(spriteBatch, hitBoxTexture, debugFont);
+                    specialBones[i].DebugDraw(spriteBatch, hitBoxTexture);
                 }
                 for (int i = 0; i < skulls.Count; i++)
                 {
