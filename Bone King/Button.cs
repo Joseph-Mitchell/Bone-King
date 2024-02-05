@@ -5,40 +5,35 @@ namespace Bone_King
 {
     class Button
     {
-        Sprite sprite;
+        Texture2D texture;
+        Vector2 position;
 
         public ButtonEffect effect;
 
         public bool hovered, active;
 
-        public Button(int x, int y, ButtonEffect effect)
+        public Button(Texture2D texture, int x, int y, ButtonEffect effect)
         {
             active = true;
-            sprite = new Sprite(x, y, 1)
-            {
-                centerOrigin = true
-            };
+            this.texture = texture;
+            position = new Vector2(x, y);
             this.effect = effect;
         }
 
-        public void Load(Texture2D texture)
-        {
-            sprite.Load(texture);
-        }
-
-        public void Update() 
+        public void Draw(SpriteBatch sb)
         {
             if (!active)
-                sprite.color = Color.White * 0.5f;
+            {
+                sb.Draw(texture, position, null, Color.White * 0.5f, 0, new Vector2(texture.Bounds.Center.X, texture.Bounds.Center.Y), 1, SpriteEffects.None, 1);
+            }
             else if (hovered)
-                sprite.color = Color.White;
+            {
+                sb.Draw(texture, position, null, Color.White, 0, new Vector2(texture.Bounds.Center.X, texture.Bounds.Center.Y), 1, SpriteEffects.None, 1);
+            }
             else
-                sprite.color = Color.Gray;
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            sprite.Draw(spriteBatch);
+            {
+                sb.Draw(texture, position, null, Color.Gray, 0, new Vector2(texture.Bounds.Center.X, texture.Bounds.Center.Y), 1, SpriteEffects.None, 1);
+            }
         }
     }
 }

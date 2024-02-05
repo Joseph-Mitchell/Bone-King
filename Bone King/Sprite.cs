@@ -7,9 +7,7 @@ namespace Bone_King
     {
         private Texture2D texture;
         public Vector2 position;
-        public Color color;
         protected float layer;
-        public bool centerOrigin;
 
         public Sprite(int x, int y, float layer)
         {       
@@ -24,10 +22,7 @@ namespace Bone_King
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if (centerOrigin)
-                spriteBatch.Draw(texture, position, null, color, 0, new Vector2(texture.Width/2, texture.Height/2), 1, SpriteEffects.None, layer);
-            else
-                spriteBatch.Draw(texture, position, null, color, 0, Vector2.Zero, 1, SpriteEffects.None, layer);
+            spriteBatch.Draw(texture, position, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, layer);
         }
     }
 }

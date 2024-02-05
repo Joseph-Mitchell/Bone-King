@@ -92,15 +92,6 @@ namespace Bone_King
             {
                 pages[i] = new Sprite(0, 0, 0.1f);
             }
-            menuButtons[0] = new Button(graphics.PreferredBackBufferWidth / 2, 180, ButtonEffect.Play)
-            {
-                hovered = true
-            };
-            menuButtons[1] = new Button(graphics.PreferredBackBufferWidth / 2, 260, ButtonEffect.Instructions);
-            menuButtons[2] = new Button(graphics.PreferredBackBufferWidth / 2, 340, ButtonEffect.Exit);
-            instructionButtons[0] = new Button(18, 18, ButtonEffect.Left);
-            instructionButtons[1] = new Button(graphics.PreferredBackBufferWidth / 2, 17, ButtonEffect.Menu);
-            instructionButtons[2] = new Button(graphics.PreferredBackBufferWidth - 18, 18, ButtonEffect.Right);
 
             bones = new List<Bone>();
             specialBones = new List<SpecialBone>();
@@ -146,12 +137,15 @@ namespace Bone_King
             {
                 pages[i].Load(Content.Load<Texture2D>("Textures\\page-" + i));
             }
-            menuButtons[0].Load(Content.Load<Texture2D>("Textures\\playbutton"));
-            menuButtons[1].Load(Content.Load<Texture2D>("Textures\\instructionsbutton"));
-            menuButtons[2].Load(Content.Load<Texture2D>("Textures\\exitbutton"));
-            instructionButtons[0].Load(Content.Load<Texture2D>("Textures\\arrowflipped"));
-            instructionButtons[1].Load(Content.Load<Texture2D>("Textures\\menubutton"));
-            instructionButtons[2].Load(Content.Load<Texture2D>("Textures\\arrow"));
+            menuButtons[0] = new Button(Content.Load<Texture2D>("Textures\\playbutton"), graphics.PreferredBackBufferWidth / 2, 180, ButtonEffect.Play)
+            {
+                hovered = true
+            };
+            menuButtons[1] = new Button(Content.Load<Texture2D>("Textures\\instructionsbutton"), graphics.PreferredBackBufferWidth / 2, 260, ButtonEffect.Instructions);
+            menuButtons[2] = new Button(Content.Load<Texture2D>("Textures\\exitbutton"), graphics.PreferredBackBufferWidth / 2, 340, ButtonEffect.Exit);
+            instructionButtons[0] = new Button(Content.Load<Texture2D>("Textures\\arrowflipped"), 18, 18, ButtonEffect.Left);
+            instructionButtons[1] = new Button(Content.Load<Texture2D>("Textures\\menubutton"), graphics.PreferredBackBufferWidth / 2, 17, ButtonEffect.Menu);
+            instructionButtons[2] = new Button(Content.Load<Texture2D>("Textures\\arrow"), graphics.PreferredBackBufferWidth - 18, 18, ButtonEffect.Right);
             level = new Level(Content.Load<Texture2D>("Textures\\background"));
             player.Load(new List<Texture2D>{
                 Content.Load<Texture2D>("Textures\\barryRun"),
