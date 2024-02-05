@@ -15,6 +15,8 @@ namespace Bone_King
         {       
             position = new Vector2(x, y);
             this.layer = layer;
+
+            color = Color.White;
         }
 
         public void Load(Texture2D texture)

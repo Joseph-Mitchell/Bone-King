@@ -358,6 +358,10 @@ namespace Bone_King
             switch (gameState)
             {
                 case GameState.Menu:
+                    for (int i = 0; i < menuButtons.Length; i++)
+                    {
+                        menuButtons[i].Update();
+                    }
 
                     //Plays the menu song
                     if (menuSongInstance == null)
@@ -403,6 +407,10 @@ namespace Bone_King
                     }
                     break;
                 case GameState.Instructions:
+                    for (int i = 0; i < instructionButtons.Length; i++)
+                    {
+                        instructionButtons[i].Update();
+                    }
 
                     //Handle buttons
                     if (currentInput.left && !oldInput.left)
