@@ -8,6 +8,7 @@ namespace Bone_King
         private Texture2D texture;
         public Vector2 position;
         public Color color;
+        public float rotation;
         protected float layer;
         public bool centerOrigin;
 
@@ -15,6 +16,7 @@ namespace Bone_King
         {       
             position = new Vector2(x, y);
             this.layer = layer;
+            rotation = 0;
 
             color = Color.White;
         }
@@ -27,9 +29,9 @@ namespace Bone_King
         public void Draw(SpriteBatch spriteBatch)
         {
             if (centerOrigin)
-                spriteBatch.Draw(texture, position, null, color, 0, new Vector2(texture.Width/2, texture.Height/2), 1, SpriteEffects.None, layer);
+                spriteBatch.Draw(texture, position, null, color, rotation, new Vector2(texture.Width/2, texture.Height/2), 1, SpriteEffects.None, layer);
             else
-                spriteBatch.Draw(texture, position, null, color, 0, Vector2.Zero, 1, SpriteEffects.None, layer);
+                spriteBatch.Draw(texture, position, null, color, rotation, Vector2.Zero, 1, SpriteEffects.None, layer);
         }
     }
 }
