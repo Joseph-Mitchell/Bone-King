@@ -82,15 +82,15 @@ namespace Bone_King
 
             reusedTextures = new Dictionary<string, Texture2D>();
 
-            menuBackground = new Sprite(0, 0, 0.1f);
-            pauseScreen = new Sprite(0, 0, 1);
-            gameOver = new Sprite(0, 0, 1);
-            finalScore = new Sprite(0, 0, 0);
-            bonePile = new Sprite(0, 62, 0.9f);
+            menuBackground = new Sprite(Vector2.Zero, 0.1f);
+            pauseScreen = new Sprite(Vector2.Zero, 1);
+            gameOver = new Sprite(Vector2.Zero, 1);
+            finalScore = new Sprite(Vector2.Zero, 0);
+            bonePile = new Sprite(new Vector2(0, 62), 0.9f);
             pages = new Sprite[5];
             for (int i = 0; i < pages.Length; i++)
             {
-                pages[i] = new Sprite(0, 0, 0.1f);
+                pages[i] = new Sprite(Vector2.Zero, 0.1f);
             }
             menuButtons[0] = new Button(graphics.PreferredBackBufferWidth / 2, 180, ButtonEffect.Play)
             {
@@ -108,7 +108,7 @@ namespace Bone_King
             axes = new Axe[4];
             scores = new List<Scores>();
             boney = new BoneKing(42, 41);
-            beatrice = new AnimatedSprite(169, 35, 30, 1, new List<Vector2>() {new Vector2(30, 44)});
+            beatrice = new AnimatedSprite(new Vector2(169, 35), 30, 1, new List<Vector2>() {new Vector2(30, 44)});
             fire = new Fire(78, 379, 30, 36, 15, 0.8f);
 
             player = new Player(PLAYERSTARTX, PLAYERSTARTY);

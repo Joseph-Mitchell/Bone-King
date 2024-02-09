@@ -17,7 +17,7 @@ namespace Bone_King
         const int SPAWNTIME = 120;
         public Fire (int x, int y, int width, int height, int animationSpeed, float layer)
         {
-            sprite = new AnimatedSprite(x, y, animationSpeed, layer, new Vector2(30, 36)); 
+            sprite = new AnimatedSprite(new Vector2(x, y), animationSpeed, layer, new Vector2(30, 36)); 
 
             collision = new Rectangle(x, y, width, height);
             spawnTimer = SPAWNTIME;

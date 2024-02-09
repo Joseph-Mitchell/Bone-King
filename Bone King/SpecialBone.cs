@@ -25,7 +25,7 @@ namespace Bone_King
 
             active = true;
 
-            sprite = new AnimatedSprite(x, y, ANIMATIONSPEED, 0.91f, new Vector2(50, 33));
+            sprite = new AnimatedSprite(position, ANIMATIONSPEED, 0.91f, new Vector2(50, 33));
             sprite.Load(spriteSheet);
         }
 

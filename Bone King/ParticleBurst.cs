@@ -44,7 +44,7 @@ namespace Bone_King
             float size = (float)random.NextDouble();
             int lifeTime = 100 + random.Next(40);
 
-            particles.Add(new Particle(texture, position.X, position.Y, velocity.X, velocity.Y, color, rotation, rotationSpeed, size, lifeTime));
+            particles.Add(new Particle(texture, position, velocity, color, rotation, rotationSpeed, lifeTime));
         }
 
         public void Update()

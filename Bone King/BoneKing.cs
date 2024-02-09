@@ -32,7 +32,7 @@ namespace Bone_King
 
             Vector2 source1 = new Vector2(92, 70);
             Vector2 source2 = new Vector2(95, 77);
-            sprite = new AnimatedSprite(x, y, ANIMATIONSPEED, 0.9f, new List<Vector2>(){source1, source1, source2, source2});
+            sprite = new AnimatedSprite(new Vector2(x, y), ANIMATIONSPEED, 0.9f, new List<Vector2>(){source1, source1, source2, source2});
 
             collision = new Rectangle(x, y, 95, 70);
         }

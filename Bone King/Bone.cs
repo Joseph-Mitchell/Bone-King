@@ -28,10 +28,10 @@ namespace Bone_King
 
         public Bone(int x, int y, List<Texture2D> spriteSheets)
         {
-            sprite = new AnimatedSprite(x, y, ANIMATIONSPEED, 0.9f, new List<Vector2>{new Vector2(33, 33), new Vector2(50, 33)});
-
             position = new Vector2(x, y);
             velocity = Vector2.Zero;
+
+            sprite = new AnimatedSprite(position, ANIMATIONSPEED, 0.9f, new List<Vector2>{new Vector2(33, 33), new Vector2(50, 33)});
 
             groundCollision = new Rectangle(x - 7, y - 7, 15, 15);
             playerCollision = new Rectangle(x - 7, y - 7, 15, 15);

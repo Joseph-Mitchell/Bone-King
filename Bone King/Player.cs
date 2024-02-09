@@ -40,8 +40,8 @@ namespace Bone_King
 
             Vector2 source1 = new Vector2(32, 32);
             Vector2 source2 = new Vector2(48, 48);
-            sprite = new AnimatedSprite(x, y, ANIMATIONSPEED, 0.9f, new List<Vector2>{source1, source2, source1, source1, source1, source1});
             position = new Vector2(x, y);
+            sprite = new AnimatedSprite(position, ANIMATIONSPEED, 0.9f, new List<Vector2>{source1, source2, source1, source1, source1, source1});
             velocity = Vector2.Zero;
             feetRectangle = new Rectangle(x + 4, y + 29, 26, 3);
             ladderRectangle = new Rectangle(x + 4, y + 14, 26, 3);

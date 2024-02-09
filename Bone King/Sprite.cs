@@ -12,11 +12,13 @@ namespace Bone_King
         protected float layer;
         public bool centerOrigin;
 
-        public Sprite(int x, int y, float layer)
-        {       
-            position = new Vector2(x, y);
+        public Sprite(Vector2 position, float layer)
+        {
+            this.position = position;
             this.layer = layer;
+
             rotation = 0;
+            centerOrigin = false;
 
             color = Color.White;
         }

@@ -36,7 +36,7 @@ namespace Bone_King
             set { source.Y = source.Height * value; }
         }
 
-        public AnimatedSprite(int x, int y, int animationSpeed, float layer, Vector2 sourceSize) : base(x, y, layer)
+        public AnimatedSprite(Vector2 position, int animationSpeed, float layer, Vector2 sourceSize) : base(position, layer)
         {
             sourceSizes = new List<Vector2>{sourceSize};
             source = new Rectangle(0, 0, (int)sourceSizes[0].X, (int)sourceSizes[0].Y);
@@ -46,7 +46,7 @@ namespace Bone_King
             spriteEffects = SpriteEffects.None;
         }
 
-        public AnimatedSprite (int x, int y, int animationSpeed, float layer, List<Vector2> sourceSizes) : base(x, y, layer)
+        public AnimatedSprite (Vector2 position, int animationSpeed, float layer, List<Vector2> sourceSizes) : base(position, layer)
         {
             this.sourceSizes = sourceSizes;
             source = new Rectangle(0, 0, (int)sourceSizes[0].X, (int)sourceSizes[0].Y);

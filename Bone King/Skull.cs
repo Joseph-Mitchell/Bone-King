@@ -25,8 +25,8 @@ namespace Bone_King
 
         public Skull (int x, int y, Texture2D spriteSheet)
         {
-            sprite = new AnimatedSprite(x, y, ANIMATIONSPEED, 1, new Vector2(30, 32));
             position = new Vector2(x, y);
+            sprite = new AnimatedSprite(position, ANIMATIONSPEED, 1, new Vector2(30, 32));
             collision = new Rectangle(x, y, 30, 32);
 
             facingRight = true;

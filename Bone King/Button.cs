@@ -14,7 +14,7 @@ namespace Bone_King
         public Button(int x, int y, ButtonEffect effect)
         {
             active = true;
-            sprite = new Sprite(x, y, 1)
+            sprite = new Sprite(new Vector2(x, y), 1)
             {
                 centerOrigin = true
             };
