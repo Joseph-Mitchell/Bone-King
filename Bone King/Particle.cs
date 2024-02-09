@@ -5,24 +5,26 @@ namespace Bone_King
 {
     public class Particle
     {
-        public Texture2D texture;
-        public Vector2 position, velocity;
-        public Color color;
-
-        public float rotation, rotationSpeed, size;
+        Sprite sprite;
+        public Vector2 velocity;
+        public float rotationSpeed;
         public int lifeTime;
 
         const float GRAVITY = 0.15f;
-        public Particle(Texture2D particleTexture, float x, float y, float xV, float yV, Color particleColor, float particleRotation, float particleRotationSpeed, float particleSize, int particleLifeTime)
+        public Particle(Texture2D texture, Vector2 position, Vector2 velocity, Color color, float rotation, float rotationSpeed, int lifeTime)
         {
-            texture = particleTexture;
-            position = new Vector2(x, y);
-            velocity = new Vector2(xV, yV);
-            color = particleColor;
-            rotation = particleRotation;
-            rotationSpeed = particleRotationSpeed;
-            size = particleSize;
-            lifeTime = particleLifeTime;
+            sprite = new Sprite(position, 1)
+            {
+                centerOrigin = true,
+                rotation = rotation,
+                color = color
+            };
+
+            this.velocity = velocity;
+            this.rotationSpeed = rotationSpeed;
+            this.lifeTime = lifeTime;
+
+            sprite.Load(texture);
         }
 
         public void Update()
@@ -33,13 +35,13 @@ namespace Bone_King
             }
 
             lifeTime--;
-            position += velocity;
-            rotation += rotationSpeed;
+            sprite.position += velocity;
+            sprite.rotation += rotationSpeed;
         }
 
-        public void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            sb.Draw(texture, position, null, color, rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1, SpriteEffects.None, 1);
+            sprite.Draw(spriteBatch);
         }
     }
 }
