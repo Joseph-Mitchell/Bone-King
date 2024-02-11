@@ -41,7 +41,10 @@ namespace Bone_King
             this.position = position;
             velocity = Vector2.Zero;
 
-            colliders.Add(new Collider(new Rectangle(0, 0, 0, 0), new Vector2(0, 0)));
+            colliders = new List<Collider>
+            {
+                new Collider(new Rectangle(0, 0, 0, 0), new Vector2(0, 0))
+            };
         }
 
         protected void UpdatePosition()
