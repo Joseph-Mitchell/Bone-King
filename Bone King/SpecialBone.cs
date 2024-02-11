@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.CompilerServices;
 
 namespace Bone_King
 {
@@ -29,6 +30,12 @@ namespace Bone_King
 
             sprite = new AnimatedSprite(position, ANIMATIONSPEED, 0.91f, new Vector2(50, 33));
             sprite.Load(spriteSheet);
+        }
+
+        protected sealed override void EndUpdate()
+        {
+            base.EndUpdate();
+            sprite.Update(position);
         }
 
         public void Update(Rectangle[] platforms, SoundEffect bang)

@@ -76,7 +76,7 @@ namespace Bone_King
             }
         }
 
-        protected void EndUpdate()
+        protected virtual void EndUpdate()
         {
             groundedOld = grounded;
         }
