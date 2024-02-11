@@ -37,7 +37,7 @@ namespace Bone_King
 
             CheckGrounded(platforms);
 
-            if (velocity.Y > TOPSPEED)
+            if (velocity.Y < TOPSPEED)
                 velocity.Y += GRAVITY;
 
             //Slows down the bone every time it hits a platform
