@@ -6,7 +6,7 @@ using System.Linq;
 namespace Bone_King
 {
     public class Collider
-    {
+    { 
         public Rectangle area;
         private Vector2 offset;
 
@@ -37,25 +37,36 @@ namespace Bone_King
             this.position = position;
         }
 
-        public virtual void Update(Rectangle[] platforms)
+        protected void UpdatePosition()
         {
             position += velocity;
-            grounded = false;
+        }
 
+        protected void CheckGrounded(Rectangle[] platforms)
+        {
+            grounded = false;
             for (int i = 0; i < platforms.Length; i++)
             {
                 if (colliders["ground"].area.Intersects(platforms[i]))
                     grounded = true;
             }
+        }
 
+        protected void Gravity()
+        {
             if (!grounded)
                 velocity.Y += GRAVITY;
+        }
 
-            for(int i = 0; i < colliders.Count; i++) 
+        protected void UpdateColliders()
+        {
+            for (int i = 0; i < colliders.Count; i++)
             {
                 colliders.ElementAt(i).Value.Update(position);
             }
         }
+
+        public abstract void Update(Rectangle[] platforms);
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
