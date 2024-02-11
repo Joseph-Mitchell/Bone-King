@@ -6,20 +6,26 @@ using System.Linq;
 namespace Bone_King
 {
     public class Collider
-    { 
-        public Rectangle area;
-        private Vector2 offset;
+    {
+        private Rectangle area;
+
+        public Rectangle Area 
+        { 
+            get { return area; } 
+            set { area = value; } 
+        }
+        public Vector2 Offset { get; set; }
 
         public Collider(Rectangle area, Vector2 offset)
         {
             this.area = area;
-            this.offset = offset;
+            Offset = offset;
         }
 
         public void Update(Vector2 position) 
         {
-            area.X = (int)(position.X + offset.X);
-            area.Y = (int)(position.Y + offset.Y);
+            area.X = (int)(position.X + Offset.X);
+            area.Y = (int)(position.Y + Offset.Y);
         }
     }
 
