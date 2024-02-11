@@ -62,7 +62,7 @@ namespace Bone_King
             }
         }
 
-        protected void Gravity()
+        protected virtual void Gravity()
         {
             if (!grounded)
                 velocity.Y += GRAVITY;

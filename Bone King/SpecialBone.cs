@@ -32,6 +32,12 @@ namespace Bone_King
             sprite.Load(spriteSheet);
         }
 
+        protected sealed override void Gravity()
+        {
+            if (velocity.Y < TOPSPEED)
+                velocity.Y += GRAVITY;
+        }
+
         protected sealed override void EndUpdate()
         {
             base.EndUpdate();
@@ -44,8 +50,7 @@ namespace Bone_King
 
             CheckGrounded(platforms);
 
-            if (velocity.Y < TOPSPEED)
-                velocity.Y += GRAVITY;
+            Gravity();
 
             //Slows down the bone every time it hits a platform
             if (grounded && !groundedOld)
