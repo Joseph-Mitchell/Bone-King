@@ -28,6 +28,11 @@ namespace Bone_King
             this.texture = texture;
         }
 
+        public void Update(Vector2 position)
+        {
+            this.position = position;
+        }
+
         public virtual void Draw(SpriteBatch spriteBatch)
         {
             if (centerOrigin)
