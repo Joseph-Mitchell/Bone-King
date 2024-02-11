@@ -68,7 +68,7 @@ namespace Bone_King
 
         public abstract void Update(Rectangle[] platforms);
 
-        public virtual void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
             sprite.Draw(spriteBatch);
         }

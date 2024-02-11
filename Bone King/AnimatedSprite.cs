@@ -56,7 +56,7 @@ namespace Bone_King
             spriteEffects = SpriteEffects.None;
         }
 
-        new public void Load (Texture2D spritesheet)
+        public override void Load (Texture2D spritesheet)
         {
             sheets = new List<Texture2D>{spritesheet};
         }
@@ -87,7 +87,7 @@ namespace Bone_King
             }
         }
 
-        new public void Draw (SpriteBatch spriteBatch)
+        public override void Draw (SpriteBatch spriteBatch)
         {
             if (frameTimer > 0)
             {
@@ -102,7 +102,7 @@ namespace Bone_King
                 frameTimer = animationSpeed;
             }
             
-            spriteBatch.Draw(sheets[sheet], new Vector2((int)position.X, (int)position.Y), source, Color.White, 0, Vector2.Zero, 1, spriteEffects, layer);
+            spriteBatch.Draw(sheets[sheet], position, source, Color.White, 0, Vector2.Zero, 1, spriteEffects, layer);
         }
     }
 }

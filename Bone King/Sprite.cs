@@ -23,12 +23,12 @@ namespace Bone_King
             color = Color.White;
         }
 
-        public void Load(Texture2D texture)
+        public virtual void Load(Texture2D texture)
         {
             this.texture = texture;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             if (centerOrigin)
                 spriteBatch.Draw(texture, position, null, color, rotation, new Vector2(texture.Width/2, texture.Height/2), 1, SpriteEffects.None, layer);
