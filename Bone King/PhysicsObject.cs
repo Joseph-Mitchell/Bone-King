@@ -64,6 +64,12 @@ namespace Bone_King
                 velocity.Y += GRAVITY;
         }
 
+        protected void EndUpdate()
+        {
+            groundedOld = grounded;
+            sprite.position = position;
+        }
+
         protected void UpdateColliders()
         {
             for (int i = 0; i < colliders.Count; i++)
