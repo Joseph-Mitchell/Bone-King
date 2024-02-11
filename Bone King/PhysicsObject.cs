@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Bone_King
 {
@@ -31,12 +30,11 @@ namespace Bone_King
 
     public abstract class PhysicsObject
     {
-        protected Sprite sprite;
         protected Vector2 position, velocity;
         public List<Collider> colliders;
         protected bool grounded, groundedOld;
 
-        private float GRAVITY = 0.1f;
+        protected float GRAVITY = 0.1f;
 
         public PhysicsObject(Vector2 position)
         {
@@ -67,12 +65,6 @@ namespace Bone_King
                 velocity.Y += GRAVITY;
         }
 
-        protected void EndUpdate()
-        {
-            groundedOld = grounded;
-            sprite.position = position;
-        }
-
         protected void UpdateColliders()
         {
             for (int i = 0; i < colliders.Count; i++)
@@ -81,9 +73,9 @@ namespace Bone_King
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        protected void EndUpdate()
         {
-            sprite.Draw(spriteBatch);
+            groundedOld = grounded;
         }
     }
 }
