@@ -39,7 +39,7 @@ namespace Bone_King
         {
             for (int i = 0; i < specialBones.Count; i++)
             {
-                if (collision.Intersects(specialBones[i].collision) && specialBones[i].collision.Y > collision.Y)
+                if (collision.Intersects(specialBones[i].Collision) && specialBones[i].Collision.Y > collision.Y)
                 {
                     readyToSpawn = true;
                     specialBones.RemoveAt(i);

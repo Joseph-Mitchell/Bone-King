@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Bone_King
 {
-    class Sprite
+    public class Sprite
     {
         private Texture2D texture;
         public Vector2 position;

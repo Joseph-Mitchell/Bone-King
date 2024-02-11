@@ -612,7 +612,7 @@ namespace Bone_King
                                 specialBones[i].Update(level.platformHitBoxes, bang);
 
                                 //Kill player if collision intersects player
-                                if (specialBones[i].collision.Intersects(player.collision))
+                                if (specialBones[i].Collision.Intersects(player.collision))
                                 {
                                     playLoopInstance.Stop();
                                     if (axeLoopInstance != null)
@@ -728,7 +728,7 @@ namespace Bone_King
                             }
                             if (boney.specialBoneDrop)
                             {
-                                specialBones.Add(new SpecialBone(65, 80, Content.Load<Texture2D>("Textures\\specialBoneLadder")));
+                                specialBones.Add(new SpecialBone(new Vector2(65, 80), Content.Load<Texture2D>("Textures\\specialBoneLadder")));
                                 boney.specialBoneDrop = false;
                             }
                             //If player collides with boney, kill player

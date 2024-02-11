@@ -4,24 +4,26 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Bone_King
 {
-    class SpecialBone
+    class SpecialBone : PhysicsObject
     {
         AnimatedSprite sprite;
-        Vector2 position, velocity;
-        public Rectangle collision;
-
-        bool collisionCheck, collisionCheckOld;
         public bool active;
 
         const int ANIMATIONSPEED = 4;
-        const float GRAVITY = 0.1f, TOPSPEED = 3f;
+        const float TOPSPEED = 3f;
 
-        public SpecialBone(int x, int y, Texture2D spriteSheet)
+        public Rectangle Collision
         {
-            position = new Vector2(x, y);
-            velocity = Vector2.Zero;
+            get
+            {
+                return colliders[0].Area;
+            }
+        }
 
-            collision = new Rectangle(x + 4, y + 9, 42, 15);
+        public SpecialBone(Vector2 position, Texture2D spriteSheet):base(position)
+        {
+            colliders[0].Area = new Rectangle((int)position.X, (int)position.Y, 42, 15);
+            colliders[0].Offset = new Vector2(4, 9);
 
             active = true;
 
@@ -31,33 +33,23 @@ namespace Bone_King
 
         public void Update(Rectangle[] platforms, SoundEffect bang)
         {
-            position += velocity;
-            collisionCheck = false;
+            UpdatePosition();
 
-            //Gravity
-            if (velocity.Y < TOPSPEED)
+            CheckGrounded(platforms);
+
+            if (velocity.Y > TOPSPEED)
                 velocity.Y += GRAVITY;
 
-            //Checks if the bone hits a platform
-            for (int i = 0; i < platforms.Length; i++)
-            {
-                if (collision.Intersects(platforms[i]))
-                    collisionCheck = true;
-            }
-
             //Slows down the bone every time it hits a platform
-            if (collisionCheck && collisionCheckOld == false)
+            if (grounded && !groundedOld)
             {
                 velocity.Y = 0;
                 bang.Play();
             }
 
-            collision.X = (int)position.X + 4;
-            collision.Y = (int)position.Y + 9;
+            UpdateColliders();
 
-            collisionCheckOld = collisionCheck;
-
-            sprite.position = position;
+            EndUpdate();
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -68,7 +60,7 @@ namespace Bone_King
 #if DEBUG
         public void DebugDraw(SpriteBatch spriteBatch, Texture2D texture)
         {
-            spriteBatch.Draw(texture, collision, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(texture, colliders[0].Area, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 #endif
     }
