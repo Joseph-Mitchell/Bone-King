@@ -31,16 +31,19 @@ namespace Bone_King
 
     public abstract class PhysicsObject
     {
-        Sprite sprite;
-        Vector2 position, velocity;
-        Dictionary<string, Collider> colliders;
-        bool grounded;
+        protected Sprite sprite;
+        protected Vector2 position, velocity;
+        public List<Collider> colliders;
+        protected bool grounded, groundedOld;
 
-        float GRAVITY = 0.1f;
+        private float GRAVITY = 0.1f;
 
         public PhysicsObject(Vector2 position)
         {
             this.position = position;
+            velocity = Vector2.Zero;
+
+            colliders.Add(new Collider(new Rectangle(0, 0, 0, 0), new Vector2(0, 0)));
         }
 
         protected void UpdatePosition()
@@ -53,7 +56,7 @@ namespace Bone_King
             grounded = false;
             for (int i = 0; i < platforms.Length; i++)
             {
-                if (colliders["ground"].area.Intersects(platforms[i]))
+                if (colliders[0].Area.Intersects(platforms[i]))
                     grounded = true;
             }
         }
@@ -74,7 +77,7 @@ namespace Bone_King
         {
             for (int i = 0; i < colliders.Count; i++)
             {
-                colliders.ElementAt(i).Value.Update(position);
+                colliders[i].Update(position);
             }
         }
 
