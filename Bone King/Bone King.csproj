@@ -72,6 +72,7 @@
     <Compile Include="Axe.cs" />
     <Compile Include="ButtonManager.cs" />
     <Compile Include="Level.cs" />
+    <Compile Include="PhysicsObject.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="BoneKing.cs" />
     <Compile Include="Bone.cs" />
