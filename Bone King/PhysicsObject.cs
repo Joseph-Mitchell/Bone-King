@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace Bone_King
@@ -36,14 +35,14 @@ namespace Bone_King
 
         protected float GRAVITY = 0.1f;
 
-        public PhysicsObject(Vector2 position)
+        public PhysicsObject(Vector2 position, Collider groundCollider)
         {
             this.position = position;
             velocity = Vector2.Zero;
 
             colliders = new List<Collider>
             {
-                new Collider(new Rectangle(0, 0, 0, 0), new Vector2(0, 0))
+                groundCollider
             };
         }
 

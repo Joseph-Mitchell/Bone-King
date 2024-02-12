@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using System.Runtime.CompilerServices;
 
 namespace Bone_King
 {
@@ -21,11 +20,8 @@ namespace Bone_King
             }
         }
 
-        public SpecialBone(Vector2 position, Texture2D spriteSheet):base(position)
+        public SpecialBone(Vector2 position, Texture2D spriteSheet):base(position, new Collider(new Rectangle((int)position.X, (int)position.Y, 42, 15), new Vector2(4, 9)))
         {
-            colliders[0].Area = new Rectangle((int)position.X, (int)position.Y, 42, 15);
-            colliders[0].Offset = new Vector2(4, 9);
-
             active = true;
 
             sprite = new AnimatedSprite(position, ANIMATIONSPEED, 0.91f, new Vector2(50, 33));
