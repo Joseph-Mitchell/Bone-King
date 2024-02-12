@@ -74,10 +74,5 @@ namespace Bone_King
                 colliders[i].Update(position);
             }
         }
-
-        protected virtual void EndUpdate()
-        {
-            groundedOld = grounded;
-        }
     }
 }

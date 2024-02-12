@@ -27,12 +27,6 @@ namespace Bone_King
             sprite.Load(spriteSheet);
         }
 
-        protected sealed override void EndUpdate()
-        {
-            base.EndUpdate();
-            sprite.Update(position);
-        }
-
         public void Update(Rectangle[] platforms, SoundEffect bang)
         {
             UpdatePosition();
@@ -51,7 +45,7 @@ namespace Bone_King
 
             UpdateColliders();
 
-            EndUpdate();
+            sprite.Update(position);
         }
 
         public void Draw(SpriteBatch spriteBatch)
