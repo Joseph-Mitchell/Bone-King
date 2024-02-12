@@ -31,7 +31,7 @@ namespace Bone_King
     {
         protected Vector2 position, velocity;
         public List<Collider> colliders;
-        protected bool grounded, groundedOld;
+        protected bool grounded;
 
         protected const float GRAVITY = 0.1f, MAXFALL = 3;
 

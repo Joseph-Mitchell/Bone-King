@@ -37,6 +37,7 @@ namespace Bone_King
         {
             UpdatePosition();
 
+            bool groundedOld = grounded;
             CheckGrounded(platforms);
 
             Gravity();
