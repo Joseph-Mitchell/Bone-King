@@ -10,7 +10,6 @@ namespace Bone_King
         public bool active;
 
         const int ANIMATIONSPEED = 4;
-        const float TOPSPEED = 3f;
 
         public Rectangle Collision
         {
@@ -26,12 +25,6 @@ namespace Bone_King
 
             sprite = new AnimatedSprite(position, ANIMATIONSPEED, 0.91f, new Vector2(50, 33));
             sprite.Load(spriteSheet);
-        }
-
-        protected sealed override void Gravity()
-        {
-            if (velocity.Y < TOPSPEED)
-                velocity.Y += GRAVITY;
         }
 
         protected sealed override void EndUpdate()

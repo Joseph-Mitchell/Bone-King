@@ -33,7 +33,7 @@ namespace Bone_King
         public List<Collider> colliders;
         protected bool grounded, groundedOld;
 
-        protected float GRAVITY = 0.1f;
+        protected const float GRAVITY = 0.1f, MAXFALL = 3;
 
         public PhysicsObject(Vector2 position, Collider groundCollider)
         {
@@ -63,7 +63,7 @@ namespace Bone_King
 
         protected virtual void Gravity()
         {
-            if (!grounded)
+            if (!grounded && velocity.Y < MAXFALL)
                 velocity.Y += GRAVITY;
         }
 
