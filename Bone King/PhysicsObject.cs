@@ -32,6 +32,7 @@ namespace Bone_King
         protected Vector2 position, velocity;
         public List<Collider> colliders;
         protected bool grounded;
+        protected int groundedPlatform;
 
         protected const float GRAVITY = 0.1f, MAXFALL = 3;
 
@@ -40,10 +41,7 @@ namespace Bone_King
             this.position = position;
             velocity = Vector2.Zero;
 
-            colliders = new List<Collider>
-            {
-                groundCollider
-            };
+            colliders = new List<Collider>{groundCollider};
         }
 
         protected void UpdatePosition()
@@ -57,7 +55,11 @@ namespace Bone_King
             for (int i = 0; i < platforms.Length; i++)
             {
                 if (colliders[0].Area.Intersects(platforms[i]))
+                {
                     grounded = true;
+                    groundedPlatform = i;
+                    return;
+                }
             }
         }
 
@@ -70,9 +72,7 @@ namespace Bone_King
         protected void UpdateColliders()
         {
             for (int i = 0; i < colliders.Count; i++)
-            {
                 colliders[i].Update(position);
-            }
         }
     }
 }
