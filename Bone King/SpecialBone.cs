@@ -11,20 +11,28 @@ namespace Bone_King
 
         const int ANIMATIONSPEED = 4;
 
-        public Rectangle Collision
-        {
-            get
-            {
-                return colliders[0].Area;
-            }
-        }
+        protected override bool DontGround => true;
 
-        public SpecialBone(Vector2 position, Texture2D spriteSheet):base(position, new Collider(new Rectangle((int)position.X, (int)position.Y, 42, 15), new Vector2(4, 9)))
+        public Rectangle Collision => colliders[0].Area;
+
+        public SpecialBone(Vector2 position, Texture2D spriteSheet) : base(position, new Collider(new Rectangle((int)position.X, (int)position.Y, 42, 15), new Vector2(4, 9)))
         {
             active = true;
 
             sprite = new AnimatedSprite(position, ANIMATIONSPEED, 0.91f, new Vector2(50, 33));
             sprite.Load(spriteSheet);
+        }
+
+        protected override void UpdatePosition()
+        {
+            base.UpdatePosition();
+            sprite.Update(position);
+        }
+
+        protected override void Gravity()
+        {
+            if (velocity.Y < MAXFALL)
+                velocity.Y += GRAVITY;
         }
 
         public void Update(Rectangle[] platforms, SoundEffect bang)
@@ -44,8 +52,6 @@ namespace Bone_King
             }
 
             UpdateColliders();
-
-            sprite.Update(position);
         }
 
         public void Draw(SpriteBatch spriteBatch)

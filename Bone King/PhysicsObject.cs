@@ -31,10 +31,12 @@ namespace Bone_King
     {
         protected Vector2 position, velocity;
         public List<Collider> colliders;
-        protected bool grounded;
+        protected bool grounded, facingRight;
         protected int groundedPlatform;
 
         protected const float GRAVITY = 0.1f, MAXFALL = 3;
+
+        protected virtual bool DontGround => false;
 
         public PhysicsObject(Vector2 position, Collider groundCollider)
         {
@@ -44,7 +46,7 @@ namespace Bone_King
             colliders = new List<Collider>{groundCollider};
         }
 
-        protected void UpdatePosition()
+        protected virtual void UpdatePosition()
         {
             position += velocity;
         }
@@ -54,12 +56,18 @@ namespace Bone_King
             grounded = false;
             for (int i = 0; i < platforms.Length; i++)
             {
-                if (colliders[0].Area.Intersects(platforms[i]))
+                if (!colliders[0].Area.Intersects(platforms[i]))
+                    continue;
+
+                grounded = true;
+
+                if (!DontGround && velocity.Y >= 0)
                 {
-                    grounded = true;
-                    groundedPlatform = i;
-                    return;
+                    velocity.Y = 0;
+                    position.Y = platforms[groundedPlatform].Top - colliders[0].Area.Height + 1;
                 }
+
+                return;
             }
         }
 
