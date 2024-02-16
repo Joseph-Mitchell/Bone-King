@@ -628,10 +628,10 @@ namespace Bone_King
                             #region Skull
                             for (int i = 0; i < skulls.Count; i++)
                             {
-                                skulls[i].Update(level, graphics.PreferredBackBufferWidth, player);
+                                skulls[i].Update(level.platformHitBoxes, level.ladders, player.holdingAxe);
 
                                 //Kill player if collision intersects player
-                                if (skulls[i].collision.Intersects(player.collision))
+                                if (skulls[i].colliders[0].Area.Intersects(player.collision))
                                 {
                                     playLoopInstance.Stop();
                                     if (axeLoopInstance != null)
@@ -642,12 +642,12 @@ namespace Bone_King
                                     lives -= 1;
                                 }
                                 //Deactivates skull if collides with axe 
-                                if (skulls[i].collision.Intersects(player.axeCollision) && player.holdingAxe)
+                                if (skulls[i].colliders[0].Area.Intersects(player.axeCollision) && player.holdingAxe)
                                 {
                                     skulls[i].active = false;
                                     point.Play();
                                     gameValues.score += 500;
-                                    scores.Add(new Scores(Content.Load<Texture2D>("Textures\\500"), skulls[i].collision.Center.X, skulls[i].collision.Center.Y));
+                                    scores.Add(new Scores(Content.Load<Texture2D>("Textures\\500"), skulls[i].colliders[0].Area.Center.X, skulls[i].colliders[0].Area.Center.Y));
                                 }
                             }
                             #endregion
