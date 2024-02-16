@@ -12,18 +12,18 @@ namespace Bone_King
             get { return area; } 
             set { area = value; } 
         }
-        public Vector2 Offset { get; set; }
+        public Point Offset { get; set; }
 
-        public Collider(Rectangle area, Vector2 offset)
+        public Collider(Rectangle area, Point offset)
         {
             this.area = area;
             Offset = offset;
         }
 
-        public void Update(Vector2 position) 
+        public void Update(Point position) 
         {
-            area.X = (int)(position.X + Offset.X);
-            area.Y = (int)(position.Y + Offset.Y);
+            area.X = position.X + Offset.X;
+            area.Y = position.Y + Offset.Y;
         }
     }
 
@@ -38,12 +38,12 @@ namespace Bone_King
 
         protected virtual bool DontGround => false;
 
-        public PhysicsObject(Vector2 position, Collider groundCollider)
+        public PhysicsObject(Vector2 position, Point groundColliderArea, Point groundColliderOffset)
         {
             this.position = position;
             velocity = Vector2.Zero;
 
-            colliders = new List<Collider>{groundCollider};
+            colliders = new List<Collider>{new Collider(new Rectangle(Point.Zero, groundColliderArea), groundColliderOffset)};
         }
 
         protected virtual void UpdatePosition()
@@ -80,7 +80,7 @@ namespace Bone_King
         protected void UpdateColliders()
         {
             for (int i = 0; i < colliders.Count; i++)
-                colliders[i].Update(position);
+                colliders[i].Update(new Point((int)position.X, (int)position.Y));
         }
     }
 }
