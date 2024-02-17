@@ -22,9 +22,9 @@ namespace Bone_King
         }
         public Point Offset { get; set; }
 
-        public Collider(Rectangle area, Point offset)
+        public Collider(Point area, Point offset)
         {
-            this.area = area;
+            this.area = new Rectangle(Point.Zero, area);
             Offset = offset;
         }
 
