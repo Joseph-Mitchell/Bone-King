@@ -33,10 +33,10 @@ namespace Bone_King
             Offset = offset;
         }
 
-        public void Update(Point position) 
+        public void Update(Vector2 position) 
         {
-            area.X = position.X + Offset.X;
-            area.Y = position.Y + Offset.Y;
+            area.X = (int)position.X + Offset.X;
+            area.Y = (int)position.Y + Offset.Y;
         }
     }
 
@@ -93,7 +93,7 @@ namespace Bone_King
         protected void UpdateColliders()
         {
             for (int i = 0; i < colliders.Count; i++)
-                colliders[i].Update(new Point((int)position.X, (int)position.Y));
+                colliders[i].Update(position);
         }
     }
 }
