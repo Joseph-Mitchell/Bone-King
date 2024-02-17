@@ -713,7 +713,7 @@ namespace Bone_King
                             fire.Update(specialBones);
                             if (fire.spawning)
                             {
-                                skulls.Add(new Skull(78, 379, Content.Load<Texture2D>("Textures\\skull")));
+                                skulls.Add(new Skull(new Vector2(78, 379), Content.Load<Texture2D>("Textures\\skull")));
                                 fire.spawning = false;
                             }
 

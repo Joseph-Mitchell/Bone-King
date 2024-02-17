@@ -56,7 +56,7 @@ namespace Bone_King
             this.position = position;
             velocity = Vector2.Zero;
 
-            colliders = new List<Collider>{new Collider(new Rectangle(Point.Zero, groundColliderArea), groundColliderOffset)};
+            colliders = new List<Collider>{new Collider(groundColliderArea, groundColliderOffset)};
         }
 
         protected virtual void UpdatePosition()

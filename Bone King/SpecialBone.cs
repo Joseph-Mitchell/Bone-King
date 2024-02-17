@@ -15,7 +15,7 @@ namespace Bone_King
 
         public Rectangle Collision => colliders[0].Area;
 
-        public SpecialBone(Vector2 position, Texture2D spriteSheet) : base(position, new Collider(new Rectangle((int)position.X, (int)position.Y, 42, 15), new Vector2(4, 9)))
+        public SpecialBone(Vector2 position, Texture2D spriteSheet) : base(position, new Point(42, 15), new Point(4, 9))
         {
             active = true;
 

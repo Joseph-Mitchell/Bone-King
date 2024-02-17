@@ -21,7 +21,7 @@ namespace Bone_King
         const int ANIMATIONSPEED = 15;
         const float MOVEMENTSPEED = 0.7f;
 
-        public Skull (int x, int y, Texture2D spriteSheet) : base(new Vector2(x, y), new Point(30, 32), Point.Zero)
+        public Skull (Vector2 position, Texture2D spriteSheet) : base(position, new Point(30, 32), Point.Zero)
         {
             sprite = new AnimatedSprite(position, ANIMATIONSPEED, 1, new Vector2(30, 32));
 
