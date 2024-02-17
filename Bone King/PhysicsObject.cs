@@ -37,7 +37,8 @@ namespace Bone_King
 
     public abstract class PhysicsObject
     {
-        protected Vector2 position, velocity;
+        protected Point position;
+        protected Vector2 velocity;
         public List<Collider> colliders;
         protected bool grounded, facingRight;
         protected int groundedPlatform;
@@ -46,17 +47,18 @@ namespace Bone_King
 
         protected virtual bool DontGround => false;
 
-        public PhysicsObject(Vector2 position, Point groundColliderArea, Point groundColliderOffset)
+        public PhysicsObject(Point position, Collider groundCollider)
         {
             this.position = position;
             velocity = Vector2.Zero;
 
-            colliders = new List<Collider>{new Collider(new Rectangle(Point.Zero, groundColliderArea), groundColliderOffset)};
+            colliders = new List<Collider>{ groundCollider };
+            colliders[0].Update(position);
         }
 
         protected virtual void UpdatePosition()
         {
-            position += velocity;
+            position += velocity.ToPoint();
         }
 
         protected void CheckGrounded(Rectangle[] platforms)
