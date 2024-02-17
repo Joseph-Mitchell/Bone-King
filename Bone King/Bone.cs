@@ -10,7 +10,6 @@ namespace Bone_King
         enum State
         {
             Rolling,
-            Falling,
             Ladder
         }
 
@@ -20,6 +19,7 @@ namespace Bone_King
 
         bool atLadderTop;
         public bool active;
+        int currentLadder = -1;
 
         const int ANIMATIONSPEED = 4;
         const float BONESPEED = 1.5f, BONESPEEDLADDER = 1f;
@@ -88,15 +88,13 @@ namespace Bone_King
                     continue;
 
                 grounded = true;
+                currentLadder = -1;
 
                 if (!DontGround && velocity.Y >= 0)
                 {
                     velocity.Y = 0;
                     position.Y = platforms[i].Top - (GroundCollider.Area.Height + GroundCollider.Offset.Y) + 1;
                 }
-
-                if (state == State.Rolling)
-                    return;
 
                 bool reset = state == State.Ladder ? true : false;
 
@@ -111,14 +109,8 @@ namespace Bone_King
 
         protected void Gravity(float levelMultiplier)
         {
-            if (!grounded)
-            {
-                if (velocity.Y < MAXFALL)
-                    velocity.Y += GRAVITY * levelMultiplier;
-
-                if (state != State.Falling)
-                    ChangeState(State.Falling, facingRight: facingRight);
-            }
+            if (!grounded && velocity.Y < MAXFALL)
+                velocity.Y += GRAVITY * levelMultiplier;
         }
 
         public void Update(Ladder[] ladders, Rectangle[] platforms, Random RNG, float levelMultiplier)
@@ -131,13 +123,17 @@ namespace Bone_King
                 if (!GroundCollider.Area.Intersects(ladders[i].Top))
                     continue;
 
+                if (state == State.Ladder && currentLadder != i)
+                    break;
+
                 atLadderTop = true;
 
                 if (state == State.Rolling)
                 {
-                    int random = RNG.Next(0, 24);
+                    int random = RNG.Next(0, 20);
                     if (random == 0)
                     {
+                        currentLadder = i;
                         ChangeState(State.Ladder, reset: true);
                         position.X = (ladders[i].Top.X + (ladders[i].Top.Width / 2)) - 25;
                         position.Y += 10;
@@ -153,24 +149,19 @@ namespace Bone_King
                 Gravity(levelMultiplier);
 
             //Updates collisions and velocity
-            PlayerCollider.SetArea(new Point(15, 13));
-            PlayerCollider.Offset = new Point(7, 8);
-
-            int sign = facingRight ? 1 : -1;
             switch (state)
             {
                 case State.Rolling:
-               
-                    velocity.X = sign * BONESPEED * levelMultiplier;
-                    velocity.Y = 0;
 
-                    break;
-                case State.Falling:
-
-                    int overEdge = position.X < 56 || position.X > 456 ? 2 : 1;
+                    int sign = facingRight ? 1 : -1;
+                    int overEdge = (position.X < 55 || position.X > 435) && !grounded ? 2 : 1;
                     velocity.X = sign * BONESPEED * levelMultiplier / overEdge;
 
+                    PlayerCollider.SetArea(new Point(15, 13));
+                    PlayerCollider.Offset = new Point(7, 8);
+
                     break;
+
                 case State.Ladder:
 
                     velocity.X = 0;
