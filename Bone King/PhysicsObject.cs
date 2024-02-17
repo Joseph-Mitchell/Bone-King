@@ -45,13 +45,19 @@ namespace Bone_King
     public abstract class PhysicsObject
     {
         protected Vector2 position, velocity;
-        public List<Collider> colliders;
+        protected List<Collider> colliders;
         protected bool grounded, facingRight;
         protected int groundedPlatform;
 
         protected const float GRAVITY = 0.1f, MAXFALL = 3;
 
         protected virtual bool DontGround => false;
+
+        public Collider GroundCollider
+        {
+            get { return colliders[0]; }
+            protected set { colliders[0] = value; }
+        }
 
         public PhysicsObject(Vector2 position, Point groundColliderArea, Point groundColliderOffset)
         {
