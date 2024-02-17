@@ -75,12 +75,46 @@ namespace Bone_King
             sprite.Update(position);
         }
 
-        protected override void Gravity()
+        protected override void CheckGrounded(Rectangle[] platforms)
+        {
+            grounded = false;
+
+            if (atLadderTop && state == State.Ladder)
+                return;
+              
+            for (int i = 0; i < platforms.Length; i++)
+            {
+                if (!GroundCollider.Area.Intersects(platforms[i]))
+                    continue;
+
+                grounded = true;
+
+                if (!DontGround && velocity.Y >= 0)
+                {
+                    velocity.Y = 0;
+                    position.Y = platforms[i].Top - (GroundCollider.Area.Height + GroundCollider.Offset.Y) + 1;
+                }
+
+                if (state == State.Rolling)
+                    return;
+
+                bool reset = state == State.Ladder ? true : false;
+
+                if ((position.Y >= 100 && position.Y <= 160) || (position.Y >= 261 && position.Y <= 280) || position.Y >= 350)
+                    ChangeState(State.Rolling, reset: reset, facingRight: facingRight = false);
+                else
+                    ChangeState(State.Rolling, reset: reset, facingRight: facingRight = true);
+
+                return;
+            }
+        }
+
+        protected void Gravity(float levelMultiplier)
         {
             if (!grounded)
             {
                 if (velocity.Y < MAXFALL)
-                    velocity.Y += GRAVITY;
+                    velocity.Y += GRAVITY * levelMultiplier;
 
                 if (state != State.Falling)
                     ChangeState(State.Falling, facingRight: facingRight);
@@ -105,7 +139,7 @@ namespace Bone_King
                     if (random == 0)
                     {
                         ChangeState(State.Ladder, reset: true);
-                        position.X = (ladders[i].Top.X + (ladders[i].Top.Width / 2)) - 7;
+                        position.X = (ladders[i].Top.X + (ladders[i].Top.Width / 2)) - 25;
                         position.Y += 10;
                     }
                 }
@@ -116,18 +150,7 @@ namespace Bone_King
                 CheckGrounded(platforms);
 
             if (state != State.Ladder)           
-                Gravity();
-
-            //Changes state depending on bones position and collisions
-            if (grounded && state != State.Rolling)
-            {
-                bool reset = state == State.Ladder ? true : false;
-
-                if ((position.Y >= 148 && position.Y <= 220) || (position.Y >= 268 && position.Y <= 336) || position.Y >= 390)
-                    ChangeState(State.Rolling, reset: reset, facingRight: facingRight = false);
-                else
-                    ChangeState(State.Rolling, reset: reset, facingRight: facingRight = true);
-            }
+                Gravity(levelMultiplier);
 
             //Updates collisions and velocity
             PlayerCollider.SetArea(new Point(15, 13));
@@ -145,9 +168,7 @@ namespace Bone_King
                 case State.Falling:
 
                     int overEdge = position.X < 56 || position.X > 456 ? 2 : 1;
-
                     velocity.X = sign * BONESPEED * levelMultiplier / overEdge;
-                    velocity.Y += GRAVITY * levelMultiplier;
 
                     break;
                 case State.Ladder:

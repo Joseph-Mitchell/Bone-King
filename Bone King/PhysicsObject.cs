@@ -72,7 +72,7 @@ namespace Bone_King
             position += velocity;
         }
 
-        protected void CheckGrounded(Rectangle[] platforms)
+        protected virtual void CheckGrounded(Rectangle[] platforms)
         {
             grounded = false;
             for (int i = 0; i < platforms.Length; i++)
