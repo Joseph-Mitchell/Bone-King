@@ -47,7 +47,6 @@ namespace Bone_King
         protected Vector2 position, velocity;
         protected List<Collider> colliders;
         protected bool grounded, facingRight;
-        protected int groundedPlatform;
 
         protected const float GRAVITY = 0.1f, MAXFALL = 3;
 
@@ -81,12 +80,12 @@ namespace Bone_King
                 if (!GroundCollider.Area.Intersects(platforms[i]))
                     continue;
 
-                grounded = true;
+                 grounded = true;
 
                 if (!DontGround && velocity.Y >= 0)
                 {
                     velocity.Y = 0;
-                    position.Y = platforms[groundedPlatform].Top - GroundCollider.Area.Height + 1;
+                    position.Y = platforms[i].Top - (GroundCollider.Area.Height + GroundCollider.Offset.Y) + 1;
                 }
 
                 return;
