@@ -5,9 +5,14 @@ namespace Bone_King
 {
     public static class ExtensionMethods
     {
-        public static Point ToPoint(this Vector2 vector)
+        public static Point ToPoint(this Vector2 vector2)
         {
-            return new Point((int)vector.X, (int)vector.Y);
+            return new Point((int)vector2.X, (int)vector2.Y);
+        }
+
+        public static Vector2 ToVector2(this Point point)
+        {
+            return new Vector2(point.X, point.Y);
         }
     }
 
