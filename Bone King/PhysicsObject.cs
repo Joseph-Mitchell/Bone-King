@@ -78,7 +78,7 @@ namespace Bone_King
             grounded = false;
             for (int i = 0; i < platforms.Length; i++)
             {
-                if (!colliders[0].Area.Intersects(platforms[i]))
+                if (!GroundCollider.Area.Intersects(platforms[i]))
                     continue;
 
                 grounded = true;
@@ -86,7 +86,7 @@ namespace Bone_King
                 if (!DontGround && velocity.Y >= 0)
                 {
                     velocity.Y = 0;
-                    position.Y = platforms[groundedPlatform].Top - colliders[0].Area.Height + 1;
+                    position.Y = platforms[groundedPlatform].Top - GroundCollider.Area.Height + 1;
                 }
 
                 return;

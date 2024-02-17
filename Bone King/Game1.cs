@@ -577,17 +577,17 @@ namespace Bone_King
                             #region Bone Updates
                             for (int i = 0; i < bones.Count; i++)
                             {
-                                bones[i].Update(level, RNG, gameValues.multiplier);
+                                bones[i].Update(level.ladders, level.platformHitBoxes, RNG, gameValues.multiplier);
                                 //Deactivates bone if collides with axe 
-                                if (bones[i].playerCollision.Intersects(player.axeCollision) && player.holdingAxe)
+                                if (bones[i].PlayerCollider.Area.Intersects(player.axeCollision) && player.holdingAxe)
                                 {
                                     bones[i].active = false;
                                     point.Play();
                                     gameValues.score += 300;
-                                    scores.Add(new Scores(Content.Load<Texture2D>("Textures\\300"), bones[i].groundCollision.Center.X, bones[i].groundCollision.Center.Y)); //Add score sprite
+                                    scores.Add(new Scores(Content.Load<Texture2D>("Textures\\300"), bones[i].GroundCollider.Area.Center.X, bones[i].GroundCollider.Area.Center.Y)); //Add score sprite
                                 }
                                 //Kill player if collision intersects player
-                                if (bones[i].playerCollision.Intersects(player.collision) && bones[i].active)
+                                if (bones[i].PlayerCollider.Area.Intersects(player.collision) && bones[i].active)
                                 {
                                     playLoopInstance.Stop();
                                     if (axeLoopInstance != null)
@@ -599,7 +599,7 @@ namespace Bone_King
                                     lives -= 1;
                                 }
                                 //Set a flag to true if player jumps over a bone
-                                if (bones[i].scoreCollision.Intersects(player.collision) && player.state == Player.State.Jumping)
+                                if (bones[i].ScoreCollider.Area.Intersects(player.collision) && player.state == Player.State.Jumping)
                                 {
                                     currentScoreCollision = true;
                                 }
@@ -631,7 +631,7 @@ namespace Bone_King
                                 skulls[i].Update(level.platformHitBoxes, level.ladders, player.holdingAxe);
 
                                 //Kill player if collision intersects player
-                                if (skulls[i].colliders[0].Area.Intersects(player.collision))
+                                if (skulls[i].GroundCollider.Area.Intersects(player.collision))
                                 {
                                     playLoopInstance.Stop();
                                     if (axeLoopInstance != null)
@@ -642,12 +642,12 @@ namespace Bone_King
                                     lives -= 1;
                                 }
                                 //Deactivates skull if collides with axe 
-                                if (skulls[i].colliders[0].Area.Intersects(player.axeCollision) && player.holdingAxe)
+                                if (skulls[i].GroundCollider.Area.Intersects(player.axeCollision) && player.holdingAxe)
                                 {
                                     skulls[i].active = false;
                                     point.Play();
                                     gameValues.score += 500;
-                                    scores.Add(new Scores(Content.Load<Texture2D>("Textures\\500"), skulls[i].colliders[0].Area.Center.X, skulls[i].colliders[0].Area.Center.Y));
+                                    scores.Add(new Scores(Content.Load<Texture2D>("Textures\\500"), skulls[i].GroundCollider.Area.Center.X, skulls[i].GroundCollider.Area.Center.Y));
                                 }
                             }
                             #endregion
@@ -721,7 +721,7 @@ namespace Bone_King
                             boney.Update(RNG, gameValues);
                             if (boney.boneDrop)
                             {
-                                bones.Add(new Bone(127, 105, new List<Texture2D>() {
+                                bones.Add(new Bone(new Vector2(127, 105), new List<Texture2D>() {
                                     reusedTextures["boneRoll"],
                                     reusedTextures["boneRollLadder"]}));
                                 boney.boneDrop = false;

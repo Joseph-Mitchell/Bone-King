@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Bone_King
 {
-    class Bone
+    class Bone : PhysicsObject
     {
         enum State
         {
@@ -15,27 +15,40 @@ namespace Bone_King
         }
 
         AnimatedSprite sprite;
-        Vector2 position, velocity;
-        public Rectangle groundCollision, playerCollision, scoreCollision;
 
         State state;
 
-        bool collisionCheck, atLadderTop, facingRight;
+        bool atLadderTop;
         public bool active;
 
         const int ANIMATIONSPEED = 4;
-        const float GRAVITY = 0.1f, BONESPEED = 1.5f, BONESPEEDLADDER = 1f;
+        const float BONESPEED = 1.5f, BONESPEEDLADDER = 1f;
 
-        public Bone(int x, int y, List<Texture2D> spriteSheets)
+        public Collider PlayerCollider
         {
-            position = new Vector2(x, y);
+            get { return colliders[1]; }
+            protected set { colliders[1] = value; }
+        }
+
+        public Collider ScoreCollider
+        {
+            get { return colliders[2]; }
+            protected set { colliders[2] = value; }
+        }
+
+        public Bone(Vector2 position, List<Texture2D> spriteSheets) : base(position, new Point(15, 15), Point.Zero)
+        {
             velocity = Vector2.Zero;
 
             sprite = new AnimatedSprite(position, ANIMATIONSPEED, 0.9f, new List<Vector2>{new Vector2(33, 33), new Vector2(50, 33)});
 
-            groundCollision = new Rectangle(x - 7, y - 7, 15, 15);
-            playerCollision = new Rectangle(x - 7, y - 7, 15, 15);
-            scoreCollision = new Rectangle(x - 2, y - 17, 4, 10);
+            colliders.AddRange(new List<Collider>
+            { 
+                new Collider(new Point(15, 13), new Point(0, 2)), //[1] Player Collision
+                new Collider(new Point(4, 20), new Point(5, -20))  //[2] Score Collision
+            });
+            colliders[1].Update(position);
+            colliders[2].Update(position);
 
             ChangeState(State.Rolling, facingRight = true);
 
@@ -56,18 +69,35 @@ namespace Bone_King
                 sprite.ChangeSheet(sheet, spriteEffects: SpriteEffects.FlipHorizontally, reset: reset);
         }
 
-        public void Update(Level background, Random RNG, float levelMultiplier)
+        protected override void UpdatePosition()
         {
-            position += velocity;
-            collisionCheck = false;
+            base.UpdatePosition();
+            sprite.Update(position);
+        }
+
+        protected override void Gravity()
+        {
+            if (!grounded)
+            {
+                if (velocity.Y < MAXFALL)
+                    velocity.Y += GRAVITY;
+
+                if (state != State.Falling)
+                    ChangeState(State.Falling, facingRight: facingRight);
+            }
+        }
+
+        public void Update(Ladder[] ladders, Rectangle[] platforms, Random RNG, float levelMultiplier)
+        {
+            UpdatePosition();
 
             atLadderTop = false;
-            for (int i = 0; i < background.ladders.Length; i++)
+            for (int i = 0; i < ladders.Length; i++)
             {
-                if (groundCollision.Intersects(background.ladders[i].Top))
-                    atLadderTop = true;
-                else
+                if (!GroundCollider.Area.Intersects(ladders[i].Top))
                     continue;
+
+                atLadderTop = true;
 
                 if (state == State.Rolling)
                 {
@@ -75,7 +105,7 @@ namespace Bone_King
                     if (random == 0)
                     {
                         ChangeState(State.Ladder, reset: true);
-                        position.X = background.ladders[i].Top.X + (background.ladders[i].Top.Width / 2);
+                        position.X = (ladders[i].Top.X + (ladders[i].Top.Width / 2)) - 7;
                         position.Y += 10;
                     }
                 }
@@ -83,51 +113,40 @@ namespace Bone_King
             }
 
             if (!(atLadderTop && state == State.Ladder))
-            {
-                for (int i = 0; i < background.platformHitBoxes.Length; i++)
-                {
-                    if (!groundCollision.Intersects(background.platformHitBoxes[i]))
-                        continue;
+                CheckGrounded(platforms);
 
-                    collisionCheck = true;
-                    position.Y = background.platformHitBoxes[i].Y - 7;
-                    break;
-                }
+            if (state != State.Ladder)           
+                Gravity();
+
+            //Changes state depending on bones position and collisions
+            if (grounded && state != State.Rolling)
+            {
+                bool reset = state == State.Ladder ? true : false;
+
+                if ((position.Y >= 148 && position.Y <= 220) || (position.Y >= 268 && position.Y <= 336) || position.Y >= 390)
+                    ChangeState(State.Rolling, reset: reset, facingRight: facingRight = false);
+                else
+                    ChangeState(State.Rolling, reset: reset, facingRight: facingRight = true);
             }
 
             //Updates collisions and velocity
-            groundCollision.X = (int)position.X - 7;
-            groundCollision.Y = (int)position.Y - 7;
-            scoreCollision = new Rectangle((int)position.X - 2, (int)position.Y - 27, 4, 20);
-            playerCollision = new Rectangle((int)position.X - 7, (int)position.Y - 5, 15, 13);
-            sprite.position.X = position.X - 17;
-            sprite.position.Y = position.Y - 17;
+            PlayerCollider.SetArea(new Point(15, 13));
+            PlayerCollider.Offset = new Point(0, 2);
+
+            int sign = facingRight ? 1 : -1;
             switch (state)
             {
                 case State.Rolling:
-
-                    int sign = facingRight ? 1 : -1;
+               
                     velocity.X = sign * BONESPEED * levelMultiplier;
                     velocity.Y = 0;
 
                     break;
                 case State.Falling:
 
-                    if (!facingRight)
-                    {
-                        if (position.X + (groundCollision.Width / 2) < 64)
-                            velocity.X = -(BONESPEED * levelMultiplier) / 2;
-                        else
-                            velocity.X = -BONESPEED * levelMultiplier;
-                    }
-                    else
-                    {
-                        if (position.X - (groundCollision.Width / 2) > 448)
-                            velocity.X = (BONESPEED * levelMultiplier) / 2;
-                        else
-                            velocity.X = BONESPEED * levelMultiplier;
-                    }
+                    int overEdge = position.X < 56 || position.X > 456 ? 2 : 1;
 
+                    velocity.X = sign * BONESPEED * levelMultiplier / overEdge;
                     velocity.Y += GRAVITY * levelMultiplier;
 
                     break;
@@ -135,29 +154,13 @@ namespace Bone_King
 
                     velocity.X = 0;
                     velocity.Y = BONESPEEDLADDER * levelMultiplier;
-                    sprite.position.X = position.X - 25;
-                    playerCollision = new Rectangle((int)position.X - 20, (int)position.Y - 7, 40, 15);
+
+                    PlayerCollider.SetArea(new Point(40, 15));
+                    PlayerCollider.Offset = Point.Zero;
 
                     break;
             }
-
-            //Changes state depending on bones position and collisions
-            if (collisionCheck)
-            {
-                if (state != State.Rolling)
-                {
-                    bool reset = state == State.Ladder ? true : false;
-
-                    if ((position.Y >= 155 && position.Y <= 213) || (position.Y >= 275 && position.Y <= 329) || position.Y >= 397)
-                        ChangeState(State.Rolling, reset: reset, facingRight: facingRight = false);
-                    else
-                        ChangeState(State.Rolling, reset: reset, facingRight: facingRight = true);
-                }
-            }
-            else if (state != State.Ladder && state != State.Falling)
-            {
-                ChangeState(State.Falling, facingRight: facingRight);
-            }
+            UpdateColliders();
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -167,9 +170,9 @@ namespace Bone_King
 #if DEBUG
         public void DebugDraw(SpriteBatch spriteBatch, Texture2D hitBoxTexture)
         {
-            spriteBatch.Draw(hitBoxTexture, groundCollision, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(hitBoxTexture, playerCollision, null, Color.Blue, 0, Vector2.Zero, SpriteEffects.None, 0.99f);
-            spriteBatch.Draw(hitBoxTexture, scoreCollision, null, Color.Yellow, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(hitBoxTexture, GroundCollider.Area, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(hitBoxTexture, PlayerCollider.Area, null, Color.Blue, 0, Vector2.Zero, SpriteEffects.None, 0.99f);
+            spriteBatch.Draw(hitBoxTexture, ScoreCollider.Area, null, Color.Yellow, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 #endif
     }
