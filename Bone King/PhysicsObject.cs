@@ -20,17 +20,19 @@ namespace Bone_King
     {
         private Rectangle area;
 
-        public Rectangle Area 
-        { 
-            get { return area; } 
-            set { area = value; } 
-        }
+        public Rectangle Area { get { return area; } }
+
         public Point Offset { get; set; }
 
         public Collider(Point area, Point offset)
         {
             this.area = new Rectangle(Point.Zero, area);
             Offset = offset;
+        }
+
+        public void SetArea(Point area)
+        {
+            this.area = new Rectangle(Point.Zero, area);
         }
 
         public void Update(Vector2 position) 
@@ -57,6 +59,7 @@ namespace Bone_King
             velocity = Vector2.Zero;
 
             colliders = new List<Collider>{new Collider(groundColliderArea, groundColliderOffset)};
+            colliders[0].Update(position);
         }
 
         protected virtual void UpdatePosition()
