@@ -133,7 +133,7 @@ namespace Bone_King
 #if DEBUG
         public void DebugDraw(SpriteBatch sb, Texture2D texture)
         {
-            sb.Draw(texture, collision, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
+            //sb.Draw(texture, collision, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 #endif
     }

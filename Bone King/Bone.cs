@@ -36,7 +36,7 @@ namespace Bone_King
             protected set { colliders[2] = value; }
         }
 
-        public Bone(Vector2 position, List<Texture2D> spriteSheets) : base(position, new Point(15, 15), Point.Zero)
+        public Bone(Vector2 position, List<Texture2D> spriteSheets) : base(position, new Point(15, 15), new Point(7, 7))
         {
             velocity = Vector2.Zero;
 
@@ -44,8 +44,8 @@ namespace Bone_King
 
             colliders.AddRange(new List<Collider>
             { 
-                new Collider(new Point(15, 13), new Point(0, 2)), //[1] Player Collision
-                new Collider(new Point(4, 20), new Point(5, -20))  //[2] Score Collision
+                new Collider(new Point(15, 13), new Point(7, 8)),
+                new Collider(new Point(4, 20), new Point(12 , -13))
             });
             colliders[1].Update(position);
             colliders[2].Update(position);
@@ -131,7 +131,7 @@ namespace Bone_King
 
             //Updates collisions and velocity
             PlayerCollider.SetArea(new Point(15, 13));
-            PlayerCollider.Offset = new Point(0, 2);
+            PlayerCollider.Offset = new Point(7, 8);
 
             int sign = facingRight ? 1 : -1;
             switch (state)
@@ -171,7 +171,7 @@ namespace Bone_King
         public void DebugDraw(SpriteBatch spriteBatch, Texture2D hitBoxTexture)
         {
             spriteBatch.Draw(hitBoxTexture, GroundCollider.Area, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(hitBoxTexture, PlayerCollider.Area, null, Color.Blue, 0, Vector2.Zero, SpriteEffects.None, 0.99f);
+            spriteBatch.Draw(hitBoxTexture, PlayerCollider.Area, null, Color.Blue, 0, Vector2.Zero, SpriteEffects.None, 1.01f);
             spriteBatch.Draw(hitBoxTexture, ScoreCollider.Area, null, Color.Yellow, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 #endif

@@ -721,7 +721,7 @@ namespace Bone_King
                             boney.Update(RNG, gameValues);
                             if (boney.boneDrop)
                             {
-                                bones.Add(new Bone(new Vector2(127, 105), new List<Texture2D>() {
+                                bones.Add(new Bone(new Vector2(127, 90), new List<Texture2D>() {
                                     reusedTextures["boneRoll"],
                                     reusedTextures["boneRollLadder"]}));
                                 boney.boneDrop = false;
