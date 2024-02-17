@@ -3,6 +3,14 @@ using System.Collections.Generic;
 
 namespace Bone_King
 {
+    public static class ExtensionMethods
+    {
+        public static Point ToPoint(this Vector2 vector)
+        {
+            return new Point((int)vector.X, (int)vector.Y);
+        }
+    }
+
     public class Collider
     {
         private Rectangle area;
